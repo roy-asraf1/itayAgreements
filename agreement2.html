@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>איתי ראובני – הסכם בעל נכס לאיתי</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <style>
+    /* ─── RESET & ROOT ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f2647;
+      --blue:   #1a3a6b;
+      --gold:   #c8a84b;
+      --goldlt: #f0d86e;
+      --bg:     #0d1c35;
+      --white:  #ffffff;
+      --offwh:  #f7f8fc;
+      --text:   #1e2b3c;
+      --muted:  #6b7a8d;
+      --border: #dde2ea;
+      --radius: 16px;
+      --shadow: 0 8px 40px rgba(0,0,0,.22);
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+      background: linear-gradient(160deg, var(--bg) 0%, var(--blue) 100%);
+      min-height: 100vh;
+      color: var(--text);
+      direction: rtl;
+    }
+
+    /* ─── HEADER ─── */
+    .site-header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(15,38,71,.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(200,168,75,.25);
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+    .logo-icon {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, var(--gold), var(--goldlt));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 14px rgba(200,168,75,.45);
+      flex-shrink: 0;
+    }
+    .logo-title { color: var(--white); font-size: 18px; font-weight: 700; line-height: 1.2; }
+    .logo-sub   { color: var(--gold);  font-size: 12px; }
+
+    #backBtn {
+      display: inline-block; padding: 8px 22px;
+      background: transparent; border: 1.5px solid var(--gold); color: var(--gold);
+      border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: .2s;
+    }
+    #backBtn:hover { background: var(--gold); color: var(--navy); }
+
+    .page { padding: 36px 20px 60px; min-height: calc(100vh - 74px); }
+
+    /* ─── TWO-COLUMN LAYOUT ─── */
+    .editor-wrap {
+      display: grid;
+      grid-template-columns: 370px 1fr;
+      gap: 28px;
+      max-width: 1220px; margin: 0 auto;
+      align-items: start;
+    }
+    @media (max-width: 880px) {
+      .editor-wrap { grid-template-columns: 1fr; }
+    }
+
+    /* ─── FORM PANEL ─── */
+    .form-panel {
+      background: var(--white); border-radius: var(--radius); padding: 28px 24px;
+      box-shadow: var(--shadow); position: sticky; top: 88px;
+    }
+    .form-panel > h2 {
+      font-size: 1.25rem; color: var(--blue);
+      border-bottom: 3px solid var(--gold); padding-bottom: 12px; margin-bottom: 4px;
+    }
+    .form-panel > .fp-sub { color: var(--muted); font-size: .83rem; margin-bottom: 22px; }
+
+    .sec-title {
+      font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+      color: var(--blue); margin: 20px 0 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sec-title::after { content:''; flex:1; height:1px; background: rgba(26,58,107,.18); }
+
+    .frow { margin-bottom: 12px; }
+    .frow label { display:block; font-size:.82rem; font-weight:600; color:#556; margin-bottom:5px; }
+
+    input[type=text], input[type=number], input[type=email], select, textarea {
+      width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:9px;
+      font-family:inherit; font-size:.93rem; color: var(--text); background: var(--offwh);
+      direction:rtl; transition:border-color .2s, box-shadow .2s; outline:none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,58,107,.1); background:#fff;
+    }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+    .btn-gen {
+      width:100%; margin-top:16px; padding:13px;
+      background: linear-gradient(135deg, var(--blue), #2a5298);
+      color:#fff; border:none; border-radius:12px;
+      font-size:.97rem; font-weight:700; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:9px;
+      box-shadow: 0 5px 18px rgba(26,58,107,.32);
+      transition:transform .2s, box-shadow .2s;
+    }
+    .btn-gen:hover  { transform:translateY(-2px); box-shadow:0 8px 28px rgba(26,58,107,.42); }
+    .btn-gen:active { transform:none; }
+
+    /* ─── PREVIEW PANEL ─── */
+    .preview-panel {
+      background: var(--white); border-radius: var(--radius); padding: 26px 28px;
+      box-shadow: var(--shadow);
+    }
+    .preview-top {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid #eef0f5;
+    }
+    .preview-top h3 { color: var(--blue); font-size:1rem; }
+
+    .btn-pdf {
+      padding:9px 22px;
+      background: linear-gradient(135deg, var(--gold), var(--goldlt));
+      color: var(--navy); border:none; border-radius:9px;
+      font-size:.9rem; font-weight:700; cursor:pointer;
+      box-shadow:0 3px 12px rgba(200,168,75,.35); transition:.2s;
+    }
+    .btn-pdf:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(200,168,75,.45); }
+
+    /* ─── DOCUMENT STYLE ─── */
+    .doc-scroll {
+      max-height: 72vh; overflow-y:auto;
+      border:1px solid #e8eaf0; border-radius:12px;
+    }
+    #doc2 {
+      direction:rtl;
+      font-family: 'David', 'Times New Roman', serif;
+      font-size:14px; line-height:1.7; color:#111;
+      background:#fff; padding:52px 58px;
+    }
+
+    .doc-title { text-align:center; font-size:22px; font-weight:700; text-decoration:underline; margin-bottom:18px; }
+    
+    .clause { margin-bottom: 8px; text-align: justify; }
+    .clause-num { font-weight: 700; margin-left: 6px; }
+
+    .fv { display:inline; color:var(--blue); font-weight:600; padding:0 4px; }
+    .fv.empty { color:#bbb; }
+
+    .page-break { margin-top: 40px; margin-bottom: 40px; border-top: 2px dashed #ccc; text-align: center; color: #888; font-size: 11px; padding-top: 10px; page-break-before: always; }
+
+    .sig-table { width: 100%; margin-top: 30px; border-collapse: collapse; }
+    .sig-table td { width: 50%; text-align: center; vertical-align: top; padding: 10px; }
+    .sig-line { margin-top: 20px; border-top: 1px solid #000; width: 60%; margin-left: auto; margin-right: auto; padding-top: 5px; }
+
+    /* ─── FLATPICKR OVERRIDES ─── */
+    .flatpickr-input { cursor: pointer !important; }
+    .flatpickr-calendar { direction:ltr; }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#f0f0f0; }
+    ::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
+
+    /* ─── LOGIN OVERLAY ─── */
+    #loginOverlay {
+      position:fixed; inset:0; z-index:9999;
+      background: linear-gradient(160deg, var(--bg) 0%, var(--blue) 100%);
+      display:flex; align-items:center; justify-content:center;
+    }
+    #loginOverlay.hidden { display:none; }
+    .login-box {
+      background:var(--white); border-radius:var(--radius); padding:40px 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35); text-align:center; max-width:380px; width:90%;
+    }
+    .login-box .logo-icon { margin:0 auto 18px; }
+    .login-box h2 { color:var(--blue); font-size:1.3rem; margin-bottom:6px; }
+    .login-box p  { color:var(--muted); font-size:.88rem; margin-bottom:22px; }
+    .login-box input {
+      width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px;
+      font-size:1.05rem; text-align:center; letter-spacing:2px; direction:ltr;
+      outline:none; transition:.2s;
+    }
+    .login-box input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,58,107,.12); }
+    .login-box .login-btn {
+      width:100%; margin-top:14px; padding:12px;
+      background:linear-gradient(135deg, var(--blue), #2a5298);
+      color:#fff; border:none; border-radius:10px; font-size:.95rem; font-weight:700;
+      cursor:pointer; transition:.2s;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="logo-icon">🔒</div>
+    <h2>איתי ראובני</h2>
+    <p>הכנס קוד גישה כדי להיכנס למערכת</p>
+    <input id="loginCode" type="password" placeholder="קוד גישה" maxlength="20" onkeydown="if(event.key==='Enter')checkLogin()" />
+    <button class="login-btn" onclick="checkLogin()">כניסה</button>
+    <div class="login-err" id="loginErr" style="color:#e00;font-size:13px;margin-top:10px;"></div>
+  </div>
+</div>
+<script>
+function checkLogin(){
+  var code=document.getElementById('loginCode').value.trim();
+  if(code==='0547351024'){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    try { sessionStorage.setItem('auth','1'); } catch(e){}
+  } else {
+    document.getElementById('loginErr').textContent='קוד שגוי, נסה שנית';
+    document.getElementById('loginCode').value='';
+  }
+}
+try {
+  if(sessionStorage.getItem('auth')==='1'){
+    document.getElementById('loginOverlay').classList.add('hidden');
+  }
+} catch(e){}
+</script>
+
+<header class="site-header">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">📋</div>
+    <div>
+      <div class="logo-title">איתי ראובני</div>
+      <div class="logo-sub">יצירת הסכמים</div>
+    </div>
+  </a>
+  <a id="backBtn" href="index.html">← חזרה לדף הבית</a>
+</header>
+
+<section class="page active">
+  <div class="editor-wrap">
+    <!-- FORM -->
+    <div class="form-panel">
+      <h2>מילוי פרטי ההסכם</h2>
+      <p class="fp-sub">הסכם שירותים בין בעל הנכס לאיתי ראובני</p>
+
+      <div class="sec-title">פרטי בעל הנכס (עמוד 1)</div>
+      <div class="frow">
+        <label>תאריך ההסכם</label>
+        <input id="a2date" type="text" placeholder="לחץ לבחירת תאריך..." readonly />
+      </div>
+      <div class="frow">
+        <label>שם בעל הנכס</label>
+        <input id="a2oname" type="text" placeholder="שם מלא..." oninput="renderDoc()" />
+      </div>
+      <div class="frow">
+        <label>תעודת זהות</label>
+        <input id="a2oid" type="text" placeholder="מספר ת.ז..." oninput="renderDoc()" />
+      </div>
+      <div class="frow">
+        <label>כתובת בעל הנכס (והנכס)</label>
+        <input id="a2addr" type="text" placeholder="הכנס כתובת..." oninput="renderDoc()" />
+      </div>
+
+      <div class="sec-title">פרטי הנכס והתשלום (עמוד אחרון)</div>
+      <div class="frow">
+        <label>מספר חדרים בנכס</label>
+        <input id="a2rooms" type="number" placeholder="למשל: 4" oninput="renderDoc()" />
+      </div>
+      <div class="frow">
+        <label>תאריך יום הצילום (למועד ההבאה)</label>
+        <input id="a2sdate" type="text" placeholder="לחץ לבחירת תאריך..." readonly />
+      </div>
+      <div class="row2">
+        <div class="frow">
+          <label>שעת התחלה</label>
+          <input id="a2tstart" type="text" placeholder="HH:MM" readonly />
+        </div>
+        <div class="frow">
+          <label>שעת סיום</label>
+          <input id="a2tend" type="text" placeholder="HH:MM" readonly />
+        </div>
+      </div>
+      <div class="row2">
+        <div class="frow">
+          <label>מספר שעות כולל</label>
+          <input id="a2hours" type="number" placeholder="למשל: 8" oninput="renderDoc()" />
+        </div>
+        <div class="frow">
+          <label>סכום (₪)</label>
+          <input id="a2price" type="number" placeholder="₪ סכום..." oninput="renderDoc()" />
+        </div>
+      </div>
+      <div class="frow">
+        <label>תעריף לכל שעה נוספת (₪)</label>
+        <input id="a2extra" type="number" placeholder="₪ תעריף שעה נוספת..." oninput="renderDoc()" />
+      </div>
+
+      <button class="btn-gen" onclick="downloadPDF()">📥 הורדת PDF</button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-panel">
+      <div class="preview-top">
+        <h3>תצוגה מקדימה</h3>
+        <button class="btn-pdf" onclick="downloadPDF()">📥 הורד PDF</button>
+      </div>
+      <div class="doc-scroll">
+        <div id="doc2"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+"use strict";
+
+function g(id) { return document.getElementById(id); }
+function v(id) { const el = g(id); return el ? el.value.trim() : ''; }
+function fv(val, fallback) {
+  if (!val) return `<span class="fv empty">${fallback || '___________'}</span>`;
+  return `<span class="fv">${val}</span>`;
+}
+
+function hebDate(str) {
+  if (!str) return null;
+  const [y, m, d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  flatpickr('#a2date', { locale: 'he', dateFormat: 'Y-m-d', allowInput: false, onChange: renderDoc });
+  flatpickr('#a2sdate', { locale: 'he', dateFormat: 'Y-m-d', allowInput: false, onChange: renderDoc });
+  flatpickr('#a2tstart', { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true, defaultHour: 9, onChange: renderDoc });
+  flatpickr('#a2tend', { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true, defaultHour: 17, onChange: renderDoc });
+  renderDoc();
+});
+
+function renderDoc() {
+  const date   = hebDate(v('a2date'));
+  const oname  = v('a2oname');
+  const oid    = v('a2oid');
+  const addr   = v('a2addr');
+  
+  const rooms  = v('a2rooms');
+  const sdate  = hebDate(v('a2sdate'));
+  const tstart = v('a2tstart');
+  const tend   = v('a2tend');
+  const hours  = v('a2hours');
+  const price  = v('a2price');
+  const extra  = v('a2extra');
+
+  g('doc2').innerHTML = `
+<div class="doc-title">הסכם מתן שירותים</div>
+<div style="margin-bottom: 20px; font-weight: 700;">שנערך ונחתם בתאריך: ${fv(date, '_________')}</div>
+
+<div style="margin-bottom: 15px; font-weight: bold; text-decoration: underline;">ב י ן</div>
+
+<div style="margin-bottom: 25px;">
+  בעל הנכס <strong>${fv(oname, '____________________')}</strong><br>
+  ת.ז <strong>${fv(oid, '____________________')}</strong><br>
+  בכתובת: <strong>${fv(addr, '____________________')}</strong><br>
+  (להלן: "בעל הנכס") <br>
+  <strong style="margin-right: 40px;">מצד אחד;</strong>
+</div>
+
+<div style="margin-bottom: 15px; font-weight: bold; text-decoration: underline;">ל ב י ן</div>
+
+<div style="margin-bottom: 25px;">
+  <strong>איתי ראובני – <span style="letter-spacing:1px">LOCK AND ACTION</span></strong><br>
+  ע.מ. 208777367<br>
+  מרח' שניר 112, כפר ורדים<br>
+  (להלן: "ספק השירותים" או "השלוח") <br>
+  <strong style="margin-right: 40px;">מצד שני;</strong>
+</div>
+
+<div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו (להלן "הלקוחות" וכל אחד מהם "לקוח") שירותי איתור לוקיישנים ואובייקטים שונים לימי צילום, בהתאם לבקשת לקוחותיו, הכולל ליווי שוטף של הלקוח לרבות לימי הביקור וכן התקשרות בהסכם עם בעל הנכס כשלוח וכנציג מטעם הלקוח ("השירותים");</div>
+<div class="clause"><strong>והואיל:</strong> ובעל הנכס, הינו הבעלים החוקי והמחזיק הבלעדי של הנכס המפורט בנספח א' ("הנכס");</div>
+<div class="clause"><strong>והואיל:</strong> ובעל הנכס מעוניין להתקשר עם השלוח, אשר מהווה את שלוחו של הלקוח ופועל מטעמו, ולספק ללקוח זכות שימוש בנכס, והשלוח מעוניין להתקשר עם בעל הנכס, כשלוחו ומטעמו של הלקוח, והכל בהתאם ובכפוף לתנאים ולמגבלות המפורטים בהסכם זה;</div>
+<div class="clause" style="margin-bottom: 25px;"><strong>והואיל:</strong> וברצון הצדדים להסדיר את היחסים המשפטיים ביניהם, והכל כמפורט בהסכם זה;</div>
+
+<div style="margin-bottom: 15px;"><strong>לפיכך הוצהר, הותנה והוסכם בין הצדדים כדלקמן:</strong></div>
+
+<div class="clause"><strong>1. הגדרות ופרשנות</strong></div>
+<div class="clause">1.1. חלוקתו של הסכם זה לסעיפים ומתן כותרות לסעיפים נעשו כמראי מקום בלבד, ואין להשתמש בהם לצרכי פרשנות.</div>
+<div class="clause" style="margin-bottom: 15px;">1.2. המבוא להסכם זה מהווה חלק בלתי נפרד הימנו.</div>
+
+<div class="clause"><strong>2. מהות ההסכם</strong></div>
+<div class="clause">2.1. השלוח, במסגרת תפקידו כשלוח עבור הלקוח, מזמין בזאת מבעל הנכס את השימוש בנכס לצורך ביצוע יום צילומים בהתאם ובכפוף לתנאים ולמגבלות המפורטים בהסכם זה.</div>
+<div class="clause">2.2. הנכסים אשר את השימוש בהם מעוניין השלוח להזמין מבעל הנכס, לרבות זמני השימוש בהם, מצ"ב להלן כנספח א'.</div>
+<div class="clause">2.3. מובהר לבעל הנכס והוא מאשר כי כל טענה תביעה או דרישה שתהא לו למול לקוח, לרבות כל סכסוך או מחלוקת ביניהם, תופנה ישירות ללקוח בהתאמה, ואינה באחריותו של ספק השירותים, לרבות כל טענה תביעה או דרישה שתהא לכל צד שלישי כנגד בעל הנכס בקשר עם השימוש שיבצע הלקוח בנכס. בעל הנכס ישפה ויפצה את ספק השירותים בגין כל נזק אובדן או חיוב שיגרמו לו עקב תביעה או דרישה מאת צד שלישי, לרבות הלקוח, שמקורה בשימוש בנכס על ידי הלקוח.</div>
+<div class="clause">2.4. ביטוח. בעל הנכס מתחייב כי הנכס מבוטח בפוליסת ביטוח בסכומים המקובלים בתעשיה בהתאם למפורט בנספח א'. בעל הנכס ימציא לספק השירותים אישור על קיום ביטוחים כאמור במעמד חתימת הסכם זה. מובהר כי העברת העתק מהפוליסה לספק השירותים לא תהווה כל מחויבות או אחריות מצד ספק השירותים או לאישורו כי הפוליסה תקינה או מכסה כיסוי מינימלי כלשהו, וכי החזקת פוליסה כאמור בתוקף לכל אורך תקופת ההסכם הינה תנאי חובה להסכם זה.</div>
+<div class="clause">2.5. בעל הנכס מתחייב כי לא יפנה ולא יקיים כל קשר עם לקוח אשר יבצע שימוש בנכס, אשר הופנה אליו על ידי ספק השירותים, ללא אישורו של ספק השירותים. בכל מקרה בו יתקשר בעל הנכס בעתיד עם כל לקוח כאמור, יהא זכאי ספק השירותים לקבל את הסכום המפורט בסעיף התמורה שבהסכם זה.</div>
+<div class="clause">2.6. ככל וימצא לקוח אשר מעוניין לבצע שימוש בנכס לצורך יום צילומים, יחתום בעל הנכס על נספח יציאה לסיור בנוסח המצ"ב להלן כנספח ב', ויערך סיור מקדים בהשתתפות הלקוח, בו יוכל הלקוח לראות את הנכס.</div>
+<div class="clause">2.7. בעל הנכס מצהיר ומתחייב כי ידוע לו כי לאחר החתימה על הסכם זה, לא ניתן יהיה לבצע שינוי בו על ידי בעל הנכס, וידוע לו כי על סמך האמור בהסכם זה, מתחייב השלוח בהסכם מול הלקוח. ככל שיבקש השלוח לבצע שינוי בתנאי הסכם זה לאחר חתימתו, עקב בקשה שמקורה בדרישות הלקוח, אזי יפנה לבעל הנכס ובעל הנכס לא יסרב לשינוי כאמור אלא מנימוקים סבירים.</div>
+<div class="clause" style="margin-bottom: 15px;">2.8. מובהר לבעל הנכס כי כל סטיה או אי התאמה שתהיה בנכס ביחס להזמנה, תיפתר בין בעל הנכס והלקוח בלבד, למעט אם מקורה ברשלנותו של ספק השירותים או בזדון.</div>
+
+<div class="clause"><strong>3. הצהרות הצדדים</strong></div>
+<div class="clause">3.1. כל צד מצהיר כי אין מניעה או הגבלה חוזית חוקית או אחרת להתקשרותו בהסכם זה.</div>
+<div class="clause">3.2. השלוח מצהיר כי הלקוח התחייב לו כי יבצע את פעילותו בנכס תוך שמירה על הוראות הדין, והלקוח יקפיד לשמור על הנכס וכל הרכוש הנמצא בו שמירה קפדנית ולהחזירו בתום הפעילות במצב זהה לזה שקיבלו. ככל ונגרם נזק כלשהו לנכס, ידווח השלוח לבעל הנכס על הנזק האמור, עם ידיעתו על כך. כל נזק אובדן או חיוב שיגרם לנכס, כאשר היה בידיו של הלקוח, יהיו באחריותו של הלקוח ועל חשבונו.</div>
+<div class="clause">3.3. השלוח מצהיר כי הלקוח המתחייב כי במסגרת השימוש בנכס, לא תבוצע כל פעילות אשר הינה בניגוד לדין לרבות אך לא רק, ניצול בקטינים, פורנוגרפיה, הלבנת כספים, עיסוק או מכירת חומרי נפץ ונשק וכיו"ב.</div>
+<div class="clause">3.4. בעל הנכס מצהיר כי הנכס יועמד ללקוח במועד שהתחייב לו בעל הנכס, במצב שבו הוא הוצג במועד הסיור המקדים.</div>
+<div class="clause" style="margin-bottom: 15px;">3.5. מובהר כי ספק השירותים אינו מספק כל שירותים לבעל הנכס במסגרת הסכם זה.</div>
+
+<div class="clause"><strong>4. התמורה</strong></div>
+<div class="clause">4.1. בגין השימוש בנכס, ישלם השלוח לבעל הנכס, בשם הלקוח, את התמורה כפי המפורט בנספח א' ("התמורה"). התמורה תשולם לספק השירותים, עם שליחת טופס ההזמנה על ידי ספק השירותים. לכל הסכומים יצורף מע"מ כדין.</div>
+<div class="clause">4.2. השלוח יהא רשאי לבטל את הזמנת הנכס בהודעה מראש ובכתב לבעל הנכס של 3 ימים.</div>
+<div class="clause">4.3. התשלום לבעל הנכס יעשה בכפוף לקבלת חשבונית מס מבעל הנכס, ולאחר התשלום יוציא בעל הנכס קבלה.</div>
+<div class="clause" style="margin-bottom: 15px;">4.4. מעבר לתמורה המפורטת להלן בהסכם זה, לא יהיה זכאי בעל הנכס לתמורה נוספת.</div>
+
+<div class="clause"><strong>5. תקופת ההסכם</strong></div>
+<div class="clause">5.1. תקופת ההתקשרות בין הצדדים תחל ביום חתימת הסכם זה ותהא בתוקף עד לסיום השימוש בנכס והחזרתו לבעל הנכס (להלן: "תקופת ההסכם").</div>
+<div class="clause" style="margin-bottom: 15px;">5.2. כל צד יהיה רשאי להפסיק את ההתקשרות בהסכם זה, במידה והפר הצד השני את הסכם זה הפרה מהותית, ולא תיקן את ההפרה בתוך 14 ימים ממועד קבלת הודעה בכתב מהצד הניפר באמצעות דואר אלקטרוני, אודות ההפרה.</div>
+
+<div class="clause"><strong>6. סודיות</strong></div>
+<div class="clause" style="margin-bottom: 15px;">כל צד מצהיר ומתחייב כי במשך תקופת ההתקשרות וכן לאחריה (ללא הגבלת זמן), הוא ישמור בסודיות מוחלטת ולא יבצע כל שימוש בכל מידע או ידיעות הקשורים, במישרין או בעקיפין, לעסקיו ו/או פעילותו של הצד השני, וכל מידע הקשור אליו ו/או לחוג לקוחותיו ו/או ספקיו, ו/או לעסקים הקשורים בצורה כלשהי לצד השני, לרבות מידע או ידע טכני, עסקי, כלכלי, מסחרי או אחר, לרבות סכומי התשלום ששולמו על ידי ספק השירותים ו/או מידע אשר הגיע אליו ו/או לרשותו במהלך או עקב התקשרותו בהסכם זה ולרבות תוכן הסכם זה, למעט מידע אשר הינו בנחלת הכלל ו/או אשר היה בידיעתו של אותו צד בטרם ההתקשרות בהסכם זה, ו/או אשר התגלה לו שלא במסגרת הסכם זה. כמו כן מתחייב בעל הנכס כי ישמור בסוד ולא יגלה כל מידע סודי השייך לבעל הנכס או שהתגלה לו במסגרת השימוש בנכס.</div>
+
+<div class="clause"><strong>7. היעדר אחריות</strong></div>
+<div class="clause">7.1. ספק השירותים אינו מספק כל מצג או התחייבות הנוגעת ללקוח בקשר עם סוג השימוש בנכס, מטרתו או כמות האנשים שיבצעו שימוש, וכל מידע אשר יספק לבעל הנכס הינו בהתאם לידיעתו בלבד, לא נבדק ואינו ודאי. באחריות בעל הנכס לוודא כל מידע אשר ברצונו לדעת אודות השימוש בנכס, לשאול את כל השאלות ולקבל את כל התשובות לשביעות רצונו המלאה.</div>
+<div class="clause" style="margin-bottom: 15px;">7.2. ספק השירותים ו/או מי מטעמו לא יהיה אחראי בשום מקרה לנזקים שיגרמו לבעל הנכס או למי מטעמו בקשר עם השירותים על פי הסכם זה לרבות לנזקים ישירים, עקיפים תוצאתיים או נסיבתיים או כל נזק אחר מכל מין וסוג שהוא הנובעים או הקשורים לביצוע הסכם זה, או לכל מעשה או מחדל אחר של ספק השירותים או לקוחותיו של ספק השירותים, בין שהדבר מבוסס על חוזה, ובין על דיני נזיקין, אחריות מוחלטת או כל דבר אחר היום או בעתיד.</div>
+
+<div class="clause"><strong>8. שונות</strong></div>
+<div class="clause">8.1. ספק השירותים מצהיר, כי ידוע לו שהסכם זה הינו הסכם למתן השירותים בלבד, ואין בו כדי ליצור בינו לבין בעל הנכס יחסי עובד-מעביד ואין הוא מקנה לו זכויות כלשהן מלבד אלה המפורטות בהסכם זה.</div>
+<div class="clause">8.2. הסכם זה מבטא את כל ההסכמות באופן מלא וממצה בין הצדדים לגבי הנושאים או העניינים הנדונים בו, והוא מחליף ומבטל כל מצג, הסכם, משא ומתן, נוהג, זיכרון דברים, הצעות, סיכומי דיון, מכתבי כוונות ו/או התחייבות, וכל מסמך אחר, ששררו או שהוחלפו בין הצדדים (בין בכתב ובין בעל-פה) בנושאים או בעניינים האמורים, עובר לחתימתו של הסכם זה.</div>
+<div class="clause">8.3. כל שינוי או ביטול של הוראה מהוראות הסכם זה ייעשה בכתב ובחתימת הצדדים.</div>
+<div class="clause" style="margin-bottom: 25px;">8.4. הודעות בקשר להסכם זה תשלחנה בדואר רשום או בדואר אלקטרוני או תימסרנה ביד על-פי מעני הצדדים הנקובים במבוא להסכם זה (או כל מען אחר עליו תבוא הודעה מתאימה בכתב), ויראו כל הודעה כאמור כאילו נמסרה לנמענה במוקדם שבין המועדים הבאים: עם מסירתה בפועל (או הצעתה לנמען במקרה של סירוב לקבלה), או עם עבור יום עסקים אחד ממועד שיגורה בדואר אלקטרוני, או שלושה (3) ימי עסקים מהמועד בו נמסרה למשלוח בדואר רשום, למעט הודעה בדבר שינוי מען אשר יראוה כנמסרת רק עם מסירתה בפועל לידי הנמען.</div>
+
+<div style="margin-bottom: 20px;"><strong>ולראיה באו הצדדים על החתום :</strong></div>
+
+<table class="sig-table">
+  <tr>
+    <td>
+      <div class="sig-line">בעל הנכס<br/>${fv(oname,'________________')}</div>
+    </td>
+    <td>
+      <div class="sig-line">ספק השירותים<br/>איתי ראובני</div>
+    </td>
+  </tr>
+</table>
+
+<div class="page-break"></div>
+
+<div class="doc-title" style="text-decoration:none; text-align:right;"><strong>נספח א' - לוקיישן</strong></div>
+<div style="font-weight:700; text-decoration:underline; margin-bottom:15px;">נוסח הזמנה</div>
+
+<div class="clause" style="line-height:2.2;">
+בעל הנכס מאשר בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא בכתובת: ${fv(addr, '____________________')} ("הנכס") לרבות כל תכולת הנכס, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך: ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
+</div>
+
+<div class="clause">השימוש אשר יערך בנכס הינו כדלהלן: <span class="fv">____________________________________</span></div>
+<div class="clause">דרישות נוספות הקשורות לנכס הינן כדלהלן: <strong>שטיפה וניקיון.</strong></div>
+<div class="clause">בעל הנכס מאשר כי הינו הבעלים החוקי והמחזיק הבלעדי של הנכס.</div>
+<div class="clause">בעל הנכס מצהיר ומתחייב כי הנכס מבוטח בביטוח מבנה וביטוח תכולה וכן ביטוח צד שלישי בסכומים המקובלים בתעשיה. בעל הנכס יציג העתק של פוליסות הביטוח על פי דרישה.</div>
+<div class="clause" style="line-height:2.2;">התמורה בגין השימוש בנכס תהיה כדלהלן: בגין ${fv(hours, 'X')} שעות ישולם לבעל הנכס סכום של ₪${fv(price, 'Y')}. בגין כל שעה נוספת ישולם לבעל הנכס סכום של ₪${fv(extra, 'Z')}.</div>
+<div class="clause">ידוע לבעל הנכס כי הסכם זה אינו הסכם שכירות במקרקעין כהגדרתו בדין וספק השירותים אינו מתווך במקרקעין.</div>
+<div class="clause" style="margin-bottom: 30px;">הנכס ימסר לשימוש הלקוח כאשר הינו נקי ופנוי לשימוש המיועד לו.</div>
+
+<div style="margin-bottom: 20px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
+
+<table class="sig-table">
+  <tr>
+    <td>
+      <div class="sig-line">בעל הנכס<br/>${fv(oname,'________________')}</div>
+    </td>
+    <td>
+      <div class="sig-line">ספק השירותים<br/>איתי ראובני</div>
+    </td>
+  </tr>
+</table>
+`;
+}
+
+function downloadPDF() {
+  const el = document.getElementById('doc2');
+  if (!el || typeof html2pdf === 'undefined') {
+    alert('ספריית PDF לא נטענה. אנא בדוק חיבור אינטרנט ונסה שוב.');
+    return;
+  }
+  
+  const scroller = el.closest('.doc-scroll');
+  const prevMH = scroller ? scroller.style.maxHeight : null;
+  const prevOF = scroller ? scroller.style.overflowY : null;
+  if (scroller) { scroller.style.maxHeight = 'none'; scroller.style.overflowY = 'visible'; }
+
+  const opts = {
+    margin: [15, 15, 15, 15],
+    filename: 'הסכם_בעל_נכס_לאיתי.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opts).from(el).save().then(() => {
+    if (scroller) {
+      scroller.style.maxHeight = prevMH;
+      scroller.style.overflowY = prevOF;
+    }
+  });
+}
+</script>
+</body>
+</html>

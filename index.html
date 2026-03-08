@@ -369,13 +369,13 @@ try {
     </div>
 
     <!-- כרטיס 2 -->
-    <div class="card" onclick="showPage('pg-ag2')">
+    <a href="agreement2.html" class="card" style="text-decoration:none; display:block; color:inherit;">
       <span class="card-badge ok">זמין</span>
       <div class="card-icon">📸</div>
       <h3>הסכם בין בעל נכס לאיתי</h3>
       <p>הסכם שירותי צילום נדל"ן בין בעל הנכס לבין הצלם איתי ראובני</p>
       <div class="card-cta">לחץ ליצירה ←</div>
-    </div>
+    </a>
 
     <!-- כרטיס 3 -->
     <div class="card soon">
@@ -507,80 +507,6 @@ try {
   </div>
 </section>
 
-<!-- ════════════ AGREEMENT 2: בעל נכס ↔ איתי ════════════ -->
-<section id="pg-ag2" class="page">
-  <div class="editor-wrap">
-
-    <!-- ── FORM ── -->
-    <div class="form-panel">
-      <h2>מילוי פרטי ההסכם</h2>
-      <p class="fp-sub">הסכם בין בעל נכס לאיתי ראובני</p>
-
-      <!-- עמוד ראשון -->
-      <div class="sec-title">פרטי ההסכם – עמוד ראשון</div>
-      <div class="frow">
-        <label>תאריך ההסכם</label>
-        <input id="a2date" type="text" placeholder="לחץ לבחירת תאריך..." readonly />
-      </div>
-      <div class="frow">
-        <label>שם בעל הנכס</label>
-        <input id="a2oname" type="text" placeholder="שם מלא..." oninput="render2()" />
-      </div>
-      <div class="frow">
-        <label>תעודת זהות בעל הנכס</label>
-        <input id="a2oid" type="text" placeholder="מספר ת.ז. ..." oninput="render2()" />
-      </div>
-      <div class="frow">
-        <label>כתובת בעל הנכס</label>
-        <input id="a2oaddr" type="text" placeholder="כתובת מגורים..." oninput="render2()" />
-      </div>
-
-      <!-- עמוד אחרון -->
-      <div class="sec-title">פרטי הצילום – עמוד אחרון</div>
-      <div class="frow">
-        <label>כתובת הנכס לצילום</label>
-        <input id="a2paddr" type="text" placeholder="כתובת הנכס..." oninput="render2()" />
-      </div>
-      <div class="frow">
-        <label>מספר חדרים</label>
-        <input id="a2rooms" type="number" placeholder="מספר חדרים..." min="1" max="30" oninput="render2()" />
-      </div>
-      <div class="frow">
-        <label>תאריך הצילום (מועד הצילום בפועל)</label>
-        <input id="a2sdate" type="text" placeholder="לחץ לבחירת תאריך..." readonly />
-      </div>
-      <div class="frow">
-        <label>מספר שעות צילום</label>
-        <input id="a2hours" type="number" placeholder="שעות..." min="1" max="24" oninput="render2()" />
-      </div>
-      <div class="frow">
-        <label>סכום הסכם (₪)</label>
-        <input id="a2price" type="number" placeholder="סכום..." oninput="render2()" />
-      </div>
-      <div class="frow">
-        <label>תעריף שעה נוספת (₪ לשעה)</label>
-        <input id="a2extra" type="number" placeholder="תעריף שעה..." oninput="render2()" />
-      </div>
-
-      <button class="btn-gen" onclick="downloadPDF('doc2','הסכם_בעל_נכס_איתי')">
-        📥 הורדת PDF
-      </button>
-    </div>
-
-    <!-- ── PREVIEW ── -->
-    <div class="preview-panel">
-      <div class="preview-top">
-        <h3>תצוגה מקדימה</h3>
-        <button class="btn-pdf" onclick="downloadPDF('doc2','הסכם_בעל_נכס_איתי')">📥 הורד PDF</button>
-      </div>
-      <div class="doc-scroll">
-        <div id="doc2"></div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
 <!-- ════════════ SCRIPTS ════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
@@ -630,11 +556,8 @@ document.addEventListener('DOMContentLoaded', () => {
   flatpickr('#a1date',   fpOpts(render1));
   flatpickr('#a1tstart', { ...tpOpts(render1), defaultHour:  9, defaultMinute: 0 });
   flatpickr('#a1tend',   { ...tpOpts(render1), defaultHour: 17, defaultMinute: 0 });
-  flatpickr('#a2date',   fpOpts(render2));
-  flatpickr('#a2sdate',  fpOpts(render2));
 
   render1();
-  render2();
 });
 
 // ─── PURPOSE TOGGLE ───
@@ -751,122 +674,6 @@ function render1() {
   </div>
   <div class="sig-block">
     <div class="sig-line">המזמין: ת.ז ${fv(cid,'_____')}<br/>${fv(cname,'שם המזמין')}</div>
-  </div>
-</div>`;
-}
-
-// ══════════════════════════════════
-// RENDER AGREEMENT 2
-// ══════════════════════════════════
-function render2() {
-  const date   = v('a2date');
-  const hdate  = hebDate(date);
-  const sdate  = v('a2sdate');
-  const hsdate = hebDate(sdate);
-  const oname  = v('a2oname');
-  const oid    = v('a2oid');
-  const oaddr  = v('a2oaddr');
-  const paddr  = v('a2paddr');
-  const rooms  = v('a2rooms');
-  const hours  = v('a2hours');
-  const price  = v('a2price');
-  const extra  = v('a2extra');
-
-  g('doc2').innerHTML = `
-<div class="doc-title">הסכם שירותי צילום נדל"ן</div>
-<div class="doc-subtitle">בין בעל הנכס לבין איתי ראובני</div>
-
-<div class="doc-dateline">נערך ונחתם ביום ${fv(hdate)}</div>
-
-<div style="margin-bottom:22px">
-  <div class="party-row">
-    <strong>בין:</strong>&nbsp;
-    ${fv(oname,'שם בעל הנכס')},&nbsp;ת.ז. ${fv(oid)}
-    <br/>כתובת: ${fv(oaddr,'כתובת בעל הנכס')}
-    <br/><small>(להלן: "בעל הנכס")</small>
-  </div>
-  <div class="party-row">
-    <strong>לבין:</strong>&nbsp;
-    <strong>איתי ראובני</strong>,&nbsp;צלם נדל"ן מקצועי
-    <br/><small>(להלן: "הצלם")</small>
-  </div>
-</div>
-
-<div class="whereas-box">
-  <div class="whereas-item"><strong>הואיל:</strong> ובעל הנכס מעוניין לשכור את שירותי הצלם
-    לצורך צילום מקצועי של הנכס שברשותו;</div>
-  <div class="whereas-item"><strong>הואיל:</strong> והצלם מסכים לספק שירותים אלה
-    בהתאם לתנאים הקבועים להלן;</div>
-  <div class="whereas-item"><strong>לפיכך</strong> הוסכם, הותנה והוצהר בין הצדדים כדלקמן:</div>
-</div>
-
-<div class="terms-title">תנאי ההסכם</div>
-
-<div class="clause"><span class="cn">1.</span>
-  המבוא להסכם זה מהווה חלק בלתי נפרד ממנו.</div>
-
-<div class="clause"><span class="cn">2.</span>
-  הצלם יספק לבעל הנכס שירותי צילום מקצועיים לנכס כמפורט להלן,
-  בהתאם לכל הוראות הסכם זה.</div>
-
-<div class="clause"><span class="cn">3.</span>
-  בעל הנכס מתחייב לאפשר לצלם גישה מלאה ובלתי מוגבלת לנכס
-  במועד המוסכם ולדאוג שהנכס יהיה נקי ומסודר לקראת הצילומים.</div>
-
-<div class="clause"><span class="cn">4.</span>
-  הצלם מתחייב לספק את תוצרי הצילום הנ"ל לבעל הנכס בתוך 3 ימי עסקים
-  ממועד ביצוע הצילומים, בפורמט דיגיטלי.</div>
-
-<div class="clause"><span class="cn">5.</span>
-  התשלום לצלם יבוצע בהתאם לתנאים המפורטים בעמוד האחרון של הסכם זה.</div>
-
-<div class="clause"><span class="cn">6.</span>
-  זכויות היוצרים על החומרים הצילומיים שייכות לצלם. שימוש בחומרים
-  מורשה למטרת שיווק הנכס בלבד, אלא אם הוסכם אחרת בכתב.</div>
-
-<div class="clause"><span class="cn">7.</span>
-  ביטול ההזמנה בהתראה של פחות מ-24 שעות ייגרור חיוב של 50% מסכום ההסכם.</div>
-
-<div class="clause"><span class="cn">8.</span>
-  הסכם זה מהווה את מלוא ההסכמה בין הצדדים וכל שינוי ייעשה בכתב ובחתימת שני הצדדים.</div>
-
-<div class="sig-row">
-  <div class="sig-block">
-    <div class="sig-line">בעל הנכס – חתימה<br/>${fv(oname,'שם בעל הנכס')}</div>
-  </div>
-  <div class="sig-block">
-    <div class="sig-line">איתי ראובני – חתימה</div>
-  </div>
-</div>
-
-<div class="doc-page-break">— עמוד אחרון: פרטי הצילום והתמחור —</div>
-
-<table class="info-table">
-  <tr><td>כתובת הנכס לצילום</td><td>${fv(paddr,'__________________________')}</td></tr>
-  <tr><td>מספר חדרים</td><td>${fv(rooms,'___')}</td></tr>
-  <tr><td>תאריך הצילום</td><td>${fv(hsdate)}</td></tr>
-  <tr><td>מספר שעות צילום</td><td>${rooms ? '' : ''}${fv(hours,'___')} שעות</td></tr>
-  <tr><td>סכום ההסכם</td><td>₪ ${fv(price,'_______')}</td></tr>
-  <tr><td>תעריף שעה נוספת</td><td>₪ ${fv(extra,'_______')} לכל שעה נוספת</td></tr>
-</table>
-
-<div class="clause" style="margin-top:14px"><span class="cn">א.</span>
-  בעל הנכס ישלם לצלם את הסך של
-  ${price ? '<span class="fv">₪' + price + '</span>' : fv('','₪ _______')}
-  עבור ${fv(hours,'___')} שעות צילום בנכס בכתובת ${fv(paddr,'כתובת הנכס')}
-  הכולל ${fv(rooms,'___')} חדרים.</div>
-
-<div class="clause"><span class="cn">ב.</span>
-  כל שעה נוספת מעבר לשעות המוסכמות תחויב בסכום של
-  ${extra ? '<span class="fv">₪' + extra + '</span>' : fv('','₪ _______')}
-  לשעה נוספת.</div>
-
-<div class="sig-row">
-  <div class="sig-block">
-    <div class="sig-line">בעל הנכס – חתימה<br/>${fv(oname,'שם בעל הנכס')}</div>
-  </div>
-  <div class="sig-block">
-    <div class="sig-line">איתי ראובני – חתימה</div>
   </div>
 </div>`;
 }

@@ -1,0 +1,23 @@
+{
+  "name": "codes",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000i\u0000t\u0000a\u0000y\u0000A\u0000g\u0000r\u0000e\u0000e\u0000m\u0000e\u0000n\u0000t\u0000s\u0000\r\u0000 \u0000",
+  "main": "extract.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/roy-asraf1/itayAgreements.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/roy-asraf1/itayAgreements/issues"
+  },
+  "homepage": "https://github.com/roy-asraf1/itayAgreements#readme",
+  "dependencies": {
+    "pdf-parse": "^1.1.1"
+  }
+}

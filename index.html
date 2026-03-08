@@ -325,14 +325,17 @@ function checkLogin(){
   var code=document.getElementById('loginCode').value.trim();
   if(code==='0547351024'){
     document.getElementById('loginOverlay').classList.add('hidden');
-    sessionStorage.setItem('auth','1');
+    try { sessionStorage.setItem('auth','1'); } catch(e){}
   } else {
     document.getElementById('loginErr').textContent='קוד שגוי, נסה שנית';
+    document.getElementById('loginCode').value='';
   }
 }
-if(sessionStorage.getItem('auth')==='1'){
-  document.getElementById('loginOverlay').classList.add('hidden');
-}
+try {
+  if(sessionStorage.getItem('auth')==='1'){
+    document.getElementById('loginOverlay').classList.add('hidden');
+  }
+} catch(e){}
 </script>
 
 <!-- ════════════ HEADER ════════════ -->
@@ -727,13 +730,13 @@ function render1() {
 <div style="margin-bottom:14px;">המשכיר יספק נציג צמוד מטעם הבית שילווה את הלקוח לאורך הצילומים.</div>
 
 <!-- תנאים נוספים -->
-<ul style="margin-bottom:14px; padding-right:20px; padding-left:0; list-style-type:disc; list-style-position:inside; direction:rtl; text-align:right;">
-  <li>יתאפשר להכניס לבית ציוד צילום, תאורה, הפקה וארט</li>
-  <li>יתאפשר לפתוח ארוחת בוקר וצהרים בחצר הבית או בפינת האוכל לצוות ההפקה.</li>
-  <li>יתאפשר להשתמש בחדרים למטרת איפור והלבשה.</li>
-  <li>יתאפשר להזיז חפצים שונים בבית למטרת הצילום ולהחזירם למקומם</li>
-  <li>יתאפשר להשתמש בחשמל של הבית למטרת הצילומים.</li>
-</ul>
+<div style="margin-bottom:14px; padding-right:6px; direction:rtl; text-align:right;">
+  <div style="margin-bottom:4px;">● יתאפשר להכניס לבית ציוד צילום, תאורה, הפקה וארט</div>
+  <div style="margin-bottom:4px;">● יתאפשר לפתוח ארוחת בוקר וצהרים בחצר הבית או בפינת האוכל לצוות ההפקה.</div>
+  <div style="margin-bottom:4px;">● יתאפשר להשתמש בחדרים למטרת איפור והלבשה.</div>
+  <div style="margin-bottom:4px;">● יתאפשר להזיז חפצים שונים בבית למטרת הצילום ולהחזירם למקומם</div>
+  <div style="margin-bottom:4px;">● יתאפשר להשתמש בחשמל של הבית למטרת הצילומים.</div>
+</div>
 
 <div style="margin-bottom:8px;">חומר הגלם, אופן השימוש בו ושיקולי העריכה הם של חברת ההפקה בלבד.</div>
 

@@ -158,7 +158,7 @@
     .clause { margin-bottom: 8px; text-align: justify; }
     .clause-num { font-weight: 700; margin-left: 6px; }
 
-    .fv { display:inline; color:var(--blue); font-weight:600; padding:0 4px; }
+    .fv { display:inline; color:#111; font-weight:600; padding:0 4px; }
     .fv.empty { color:#bbb; }
 
     .page-break { margin-top: 40px; margin-bottom: 40px; border-top: 2px dashed #ccc; text-align: center; color: #888; font-size: 11px; padding-top: 10px; page-break-before: always; }
@@ -166,6 +166,21 @@
     .sig-table { width: 100%; margin-top: 30px; border-collapse: collapse; }
     .sig-table td { width: 50%; text-align: center; vertical-align: top; padding: 10px; }
     .sig-line { margin-top: 20px; border-top: 1px solid #000; width: 60%; margin-left: auto; margin-right: auto; padding-top: 5px; }
+
+    /* ─── PRINT / PDF ─── */
+    @page { margin: 15mm; size: A4; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: white !important; margin: 0; padding: 0; }
+      #loginOverlay, .site-header, .form-panel, .preview-top, #backBtn { display: none !important; }
+      .page { padding: 0 !important; min-height: unset !important; }
+      .editor-wrap { display: block !important; }
+      .preview-panel { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; background: white !important; }
+      .doc-scroll { max-height: none !important; overflow: visible !important; border: none !important; border-radius: 0 !important; }
+      #doc3 { padding: 15mm 18mm !important; font-size: 13px !important; }
+      .page-break { page-break-before: always !important; border: none !important; color: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; }
+      .btn-gen, .btn-pdf { display: none !important; }
+    }
 
     /* ─── FLATPICKR OVERRIDES ─── */
     .flatpickr-input { cursor: pointer !important; }
@@ -338,14 +353,14 @@ try {
         <input id="a3extraBase" type="number" placeholder="למשל: 900" value="900" oninput="renderDoc()" />
       </div>
 
-      <button class="btn-gen" onclick="downloadPDF()">📥 הורדת PDF</button>
+      <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
     </div>
 
     <!-- PREVIEW -->
     <div class="preview-panel">
       <div class="preview-top">
         <h3>תצוגה מקדימה</h3>
-        <button class="btn-pdf" onclick="downloadPDF()">📥 הורד PDF</button>
+        <button class="btn-pdf" onclick="downloadPDF()">💾 שמור כ-PDF</button>
       </div>
       <div class="doc-scroll">
         <div id="doc3"></div>
@@ -356,7 +371,6 @@ try {
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 "use strict";
 
@@ -428,24 +442,24 @@ function renderDoc() {
 <div class="doc-title">הסכם מתן שירותים</div>
 <div style="margin-bottom: 20px; font-weight: 700;">שנערך ונחתם ביום ${fv(dateFormatted, '_______________')}</div>
 
-<div style="margin-bottom: 15px; font-weight: bold; text-decoration: underline;">ב י ן</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:20px;">ב י ן</div>
 
-<div style="margin-bottom: 25px;">
+<div style="text-align:center; margin-bottom: 20px;">
   מזמין <strong>${fv(cname, '____________________')}</strong><br>
   ת.ז <strong>${fv(cid, '____________________')}</strong><br>
-  בכתובת: <strong>${fv(caddr, '____________________')}</strong><br>
-  (להלן: "הלקוח") <br>
-  <strong style="margin-right: 40px;">מצד אחד;</strong>
+  :בכתובת <strong>${fv(caddr, '____________________')}</strong><br>
+  (להלן: "הלקוח")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">;מצד אחד</div>
 </div>
 
-<div style="margin-bottom: 15px; font-weight: bold; text-decoration: underline;">ל ב י ן</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:20px;">ל ב י ן</div>
 
-<div style="margin-bottom: 25px;">
+<div style="text-align:center; margin-bottom: 30px;">
   <strong>איתי ראובני – <span style="letter-spacing:1px">LOCK AND ACTION</span></strong><br>
   ע.מ. 208777367<br>
-  מרחוב: שניר 112, כפר ורדים<br>
-  (להלן: "ספק השירותים") <br>
-  <strong style="margin-right: 40px;">מצד שני;</strong>
+  מרחוב שניר 112, כפר ורדים<br>
+  (להלן: "ספק השירותים")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">;מצד שני</div>
 </div>
 
 <div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו שירותי איתור לוקיישנים ואובייקטים שונים לימי צילום, בהתאם לבקשת הלקוח, הכולל ליווי שוטף של הלקוח לרבות לימי הביקור וכן התקשרות בהסכם עם בעל הלוקיישן ו/או האובייקט כשלוח וכנציג מטעם הלקוח ("השירותים");</div>
@@ -580,31 +594,7 @@ function renderDoc() {
 }
 
 function downloadPDF() {
-  const el = document.getElementById('doc3');
-  if (!el || typeof html2pdf === 'undefined') {
-    alert('ספריית PDF לא נטענה. אנא בדוק חיבור אינטרנט ונסה שוב.');
-    return;
-  }
-  
-  const scroller = el.closest('.doc-scroll');
-  const prevMH = scroller ? scroller.style.maxHeight : null;
-  const prevOF = scroller ? scroller.style.overflowY : null;
-  if (scroller) { scroller.style.maxHeight = 'none'; scroller.style.overflowY = 'visible'; }
-
-  const opts = {
-    margin: [15, 15, 15, 15],
-    filename: 'הסכם_בין_איתי_למזמין.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opts).from(el).save().then(() => {
-    if (scroller) {
-      scroller.style.maxHeight = prevMH;
-      scroller.style.overflowY = prevOF;
-    }
-  });
+  window.print();
 }
 </script>
 </body>

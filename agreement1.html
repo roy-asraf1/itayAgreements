@@ -65,6 +65,20 @@
 
     /* Fix bullet margins in PDF */
     .ag-list-item { margin-bottom: 4px; padding-right: 16px; text-indent: -16px; }
+
+    /* ─── PRINT / PDF ─── */
+    @page { margin: 0; size: A4; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: white !important; margin: 0; padding: 0; }
+      .site-header, .form-panel, .preview-top, #backBtn { display: none !important; }
+      .page { padding: 0 !important; min-height: unset !important; }
+      .editor-wrap { display: block !important; }
+      .preview-panel { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; background: white !important; }
+      .doc-scroll { max-height: none !important; overflow: visible !important; border: none !important; border-radius: 0 !important; background: white !important; padding: 0 !important; display: block !important; }
+      #doc-container { box-shadow: none !important; width: 100% !important; min-height: unset !important; }
+      .btn-gen, .btn-pdf { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -137,7 +151,7 @@
           <input id="a1purpcustom" type="text" placeholder="הכנס מטרה..." oninput="render1()" style="margin-top:8px; display:none;" />
         </div>
 
-        <button class="btn-gen" onclick="downloadPDF()">📥 הורדת PDF</button>
+        <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
       </div>
 
       <!-- PREVIEW -->
@@ -156,7 +170,6 @@
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <script>
     "use strict";
@@ -299,54 +312,7 @@
     }
 
     function downloadPDF() {
-      const element = document.getElementById('doc-container');
-      const cname = v('a1cname') || 'הסכם';
-      
-      const devScroll = document.querySelector('.doc-scroll');
-
-      // איפוס גלילה מוחלט גם לדף וגם לתצוגה המקדימה 
-      // חובה כדי למנוע את "חיתוך" החלק העליון של ההסכם (כשהמשתמש גולל למטה)
-      window.scrollTo(0, 0);
-      if (devScroll) devScroll.scrollTop = 0;
-
-      // Temporarily remove constraints for perfect render
-      const prevBoxShadow = element.style.boxShadow;
-      const prevMargin = element.style.margin;
-      const prevMaxHeight = devScroll ? devScroll.style.maxHeight : '';
-      const prevOverflowY = devScroll ? devScroll.style.overflowY : '';
-
-      // Un-lock styling before rendering
-      element.style.boxShadow = 'none';
-      element.style.margin = '0'; // מונע קפיצות עקב המרכוז
-      
-      if (devScroll) {
-          devScroll.style.maxHeight = 'none';
-          devScroll.style.overflowY = 'visible';
-      }
-
-      setTimeout(() => {
-          const opt = {
-              margin: 0, 
-              filename: `הסכם_בעל_נכס_${cname}.pdf`,
-              image: { type: 'jpeg', quality: 1 },
-              html2canvas: { 
-                  scale: 3, 
-                  useCORS: true, 
-                  scrollY: 0
-              },
-              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-          };
-
-          html2pdf().set(opt).from(element).save().then(() => {
-              // Restore UI
-              element.style.boxShadow = prevBoxShadow;
-              element.style.margin = prevMargin;
-              if (devScroll) {
-                  devScroll.style.maxHeight = prevMaxHeight;
-                  devScroll.style.overflowY = prevOverflowY;
-              }
-          });
-      }, 100);
+      window.print();
     }
   </script>
 </body>

@@ -208,19 +208,19 @@
       g('doc-container').innerHTML = `
 <!-- Header -->
 <div style="position:relative; margin-bottom:12px; font-size:11pt; border:none;">
-  <span style="float:right; white-space:nowrap;">לכבוד:<br/>${fv(cname,'המזמין')}</span>
+  <span style="float:right; white-space:nowrap;">לכבוד:&rlm;<br/>${fv(cname,'המזמין')}.</span>
   <span style="float:left; white-space:nowrap;">${fv(hdate)}</span>
   <div style="clear:both;"></div>
 </div>
-<div style="margin-bottom:12px; font-size:11pt; white-space:nowrap;">סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}</div>
+<div style="margin-bottom:12px; font-size:11pt; white-space:nowrap;">${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}</div>
 
-<div class="doc-title" style="margin-bottom:10px;">הסכם שימוש בלוקיישן "${fv(ptype,'סוג בית')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}"</div>
+<div class="doc-title" style="margin-bottom:10px;">הסכם שימוש בלוקיישן &rlm;"${fv(ptype,'סוג בית')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}&rlm;"</div>
 
 <!-- Intro -->
 <div style="margin-bottom:10px;">
 <strong>בין</strong> ${fv(oname,'_____')}&nbsp;${oidtype}&nbsp;${fv(oid,'_____')}&nbsp;– להלן "חברת&nbsp;ההפקה" או&nbsp;"הלקוח"<br/>
 <strong>לבין</strong> ${fv(cname,'_____')}&nbsp;ת.ז&nbsp;${fv(cid,'_____')},&nbsp;סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')} - להלן&nbsp;"הלוקיישן".&rlm;<br/>
-הח"מ מצהיר/ה שהיא מטעם סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')},&rlm; אשר&nbsp;מנוהל ע"י&nbsp;בעל&nbsp;הנכס,&rlm; וכי&nbsp;חתימתה מחייבת את שותפיו וכן&nbsp;את&nbsp;הנכס.&rlm;
+הח"מ מצהירה שהיא מטעם ${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')},&rlm; אשר&nbsp;מנוהל ע"י&nbsp;בעל&nbsp;הנכס,&rlm; וכי&nbsp;חתימתה מחייבת את שותפיו&nbsp;וכן&nbsp;את&nbsp;הנכס.&rlm;
 </div>
 
 <div style="margin-bottom:10px;">
@@ -231,7 +231,7 @@
 </div>
 
 <div style="margin-bottom:10px;">
-צוות ההפקה – עד&nbsp;${fv(crew,'X')}&nbsp;אנשים.&rlm; על כל איש צוות נוסף יתבצע תשלום נוסף כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm; מוסכם בזאת שלצורך&nbsp;הצילומים&nbsp;הבית&nbsp;והחצר&nbsp;יעמוד&nbsp;לרשות&nbsp;הלקוח.&rlm;
+צוות ההפקה – עד&nbsp;${fv(crew,'X')}&nbsp;אנשים.&rlm; על כל איש צוות נוסף יתבצע תשלום נוסף כפי שסוכם<br/>עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm; מוסכם בזאת&nbsp;שלצורך&nbsp;הצילומים&nbsp;הבית&nbsp;והחצר&nbsp;יעמוד&nbsp;לרשות&nbsp;הלקוח.&rlm;
 </div>
 
 <!-- Terms -->
@@ -240,13 +240,13 @@
 </div>
 
 <div style="margin-bottom:10px;">
-חברת&nbsp;ההפקה מתחייבת להחזיר את&nbsp;המצב&nbsp;לקדמותו&nbsp;בגמר&nbsp;יום&nbsp;הצילום.&rlm;<br/>
-וכן חברת&nbsp;ההפקה מתחייבת לשאת באחריות מלאה לכל&nbsp;נזק&nbsp;במידה&nbsp;ויגרם&nbsp;למקום&nbsp;בעקבות&nbsp;ובמהלך יום&nbsp;הצילום&nbsp;והחזרות.&rlm;<br/>
-<span style="color:red !important;">הלקוח יבטח סיכוניו בקשר עם יום הצילומים,&rlm; ביטוח לעובדים ולציוד לרבות ביטוח צד&nbsp;ג'.&rlm; הלקוח אחראי&nbsp;לביטוח&nbsp;הנכס או תכולתו ביום הצילום בגין נזקים שיעשו למושכר ביום הצילומים,&rlm; שריפה&nbsp;וכו'.&rlm; המשכיר אינו אחראי&nbsp;לרכוש&nbsp;המפיק עובדיו ואורחיו ואינו נושא באחריות על כל נזק&nbsp;או&nbsp;פגיעה שעלולים להגרם למפיק,&rlm; עובדיו&nbsp;או&nbsp;אורחיו&nbsp;במהלך&nbsp;שהותם&nbsp;במקום.&rlm;</span>
+חברת&nbsp;ההפקה מתחייבת להחזיר&nbsp;את&nbsp;המצב&nbsp;לקדמותו&nbsp;בגמר&nbsp;יום&nbsp;הצילום.&rlm;<br/>
+וכן חברת&nbsp;ההפקה מתחייבת לשאת באחריות מלאה&nbsp;לכל&nbsp;נזק&nbsp;במידה&nbsp;ויגרם&nbsp;למקום<br/>בעקבות&nbsp;ובמהלך יום&nbsp;הצילום&nbsp;והחזרות.&rlm;<br/>
+<span style="color:red !important;">הלקוח יבטח סיכוניו בקשר עם יום הצילומים,&rlm; ביטוח לעובדים ולציוד לרבות ביטוח צד&nbsp;ג'.&rlm; הלקוח אחראי&nbsp;לביטוח&nbsp;הנכס או תכולתו ביום הצילום בגין נזקים שיעשו למושכר ביום הצילומים,&rlm; שריפה&nbsp;וכו'.&rlm; המשכיר אינו אחראי&nbsp;לרכוש&nbsp;המפיק עובדיו ואורחיו ואינו נושא באחריות על כל נזק&nbsp;או<br/>פגיעה שעלולים להגרם למפיק,&rlm; עובדיו&nbsp;או&nbsp;אורחיו&nbsp;במהלך&nbsp;שהותם&nbsp;במקום.&rlm;</span>
 </div>
 
 <div style="margin-bottom:6px;">את התמורה בגין יום הצילום יקבל בעל הנכס מאיתי ראובני "<span style="letter-spacing:1px">LOCK AND ACTION</span>" אשר&nbsp;הינה&nbsp;קשורה&nbsp;עימו&nbsp;בחוזה&nbsp;תמורה.&rlm;</div>
-<div style="margin-bottom:10px;">המשכיר יספק נציג צמוד מטעם הבית&nbsp;שילווה&nbsp;את&nbsp;הלקוח&nbsp;לאורך&nbsp;הצילומים.&rlm;</div>
+<div style="margin-bottom:10px;">המשכיר יספק נציג צמוד מטעם&nbsp;הבית&nbsp;שילווה&nbsp;את&nbsp;הלקוח&nbsp;לאורך&nbsp;הצילומים.&rlm;</div>
 
 <table style="width:100%; border-collapse:collapse; margin-bottom:10px;" dir="rtl">
   <tr>
@@ -255,7 +255,7 @@
   </tr>
   <tr>
     <td style="vertical-align:top;">&bull;</td>
-    <td>יתאפשר לפתוח ארוחת בוקר וצהרים בחצר&nbsp;הבית&nbsp;או&nbsp;בפינת&nbsp;האוכל&nbsp;לצוות&nbsp;ההפקה.&rlm;</td>
+    <td>יתאפשר לפתוח ארוחת בוקר וצהרים&nbsp;בחצר&nbsp;הבית&nbsp;או&nbsp;בפינת&nbsp;האוכל&nbsp;לצוות&nbsp;ההפקה.&rlm;</td>
   </tr>
   <tr>
     <td style="vertical-align:top;">&bull;</td>
@@ -263,7 +263,7 @@
   </tr>
   <tr>
     <td style="vertical-align:top;">&bull;</td>
-    <td>יתאפשר להזיז&nbsp;חפצים&nbsp;שונים&nbsp;בבית&nbsp;למטרת&nbsp;הצילום&nbsp;ולהחזירם&nbsp;למקומם.&rlm;</td>
+    <td>יתאפשר&nbsp;להזיז&nbsp;חפצים&nbsp;שונים&nbsp;בבית&nbsp;למטרת&nbsp;הצילום&nbsp;ולהחזירם&nbsp;למקומם.&rlm;</td>
   </tr>
   <tr>
     <td style="vertical-align:top;">&bull;</td>
@@ -293,7 +293,9 @@
   </div>
   <div style="clear:both;"></div>
 </div>
-`.replace(/\n\s*/g, ' ');
+`.replace(/\n\s*/g, ' ')
+       .replace(/(?<=[\u05D0-\u05EA"]) (?=[\u05D0-\u05EA"(])/g, '&nbsp;')
+       .replace(/(?<=[\u05D0-\u05EA"]) (?=[\u05D0-\u05EA"(])/g, '&nbsp;');
     }
 
     function downloadPDF() {

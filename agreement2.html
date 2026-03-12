@@ -148,23 +148,40 @@
     #doc2 {
       direction:rtl;
       font-family: 'David', 'Times New Roman', serif;
-      font-size:14px; line-height:1.7; color:#111;
+      font-size:12pt; line-height:1.7; color:#111;
       background:#fff; padding:52px 58px;
     }
 
     .doc-title { text-align:center; font-size:22px; font-weight:700; text-decoration:underline; margin-bottom:18px; }
     
-    .clause { margin-bottom: 8px; text-align: justify; }
+    .clause { margin-bottom: 8px; text-align: right; unicode-bidi: embed; }
     .clause-num { font-weight: 700; margin-left: 6px; }
 
-    .fv { display:inline; color:var(--blue); font-weight:600; padding:0 4px; }
+    .fv { display:inline; color:#111; font-weight:600; padding:0 4px; }
     .fv.empty { color:#bbb; }
+
 
     .page-break { margin-top: 40px; margin-bottom: 40px; border-top: 2px dashed #ccc; text-align: center; color: #888; font-size: 11px; padding-top: 10px; page-break-before: always; }
 
     .sig-table { width: 100%; margin-top: 30px; border-collapse: collapse; }
     .sig-table td { width: 50%; text-align: center; vertical-align: top; padding: 10px; }
     .sig-line { margin-top: 20px; border-top: 1px solid #000; width: 60%; margin-left: auto; margin-right: auto; padding-top: 5px; }
+
+    /* ─── PRINT / PDF ─── */
+    @page { margin: 15mm; size: A4; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: white !important; margin: 0; padding: 0; }
+      #loginOverlay, .site-header, .form-panel, .preview-top, #backBtn { display: none !important; }
+      .page { padding: 0 !important; min-height: unset !important; }
+      .editor-wrap { display: block !important; }
+      .preview-panel { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; background: white !important; }
+      .doc-scroll { max-height: none !important; overflow: visible !important; border: none !important; border-radius: 0 !important; }
+      #doc2 { padding: 15mm 18mm !important; font-size: 13px !important; }
+      .page-break { page-break-before: always !important; border: none !important; color: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; }
+      .sec-7-break { page-break-before: always !important; }
+      .btn-gen, .btn-pdf { display: none !important; }
+    }
 
     /* ─── FLATPICKR OVERRIDES ─── */
     .flatpickr-input { cursor: pointer !important; }
@@ -302,8 +319,16 @@ try {
         <label>תעריף לכל שעה נוספת (₪)</label>
         <input id="a2extra" type="number" placeholder="₪ תעריף שעה נוספת..." oninput="renderDoc()" />
       </div>
+      <div class="frow">
+        <label>השימוש אשר יערך בנכס</label>
+        <textarea id="a2usage" rows="3" placeholder="תאר את השימוש בנכס..." oninput="renderDoc()" style="resize:vertical;"></textarea>
+      </div>
+      <div class="frow">
+        <label>דרישות נוספות (מעבר לשטיפה וניקיון)</label>
+        <textarea id="a2req" rows="2" placeholder="לדוגמה: סידור הגינה, פינוי חדר..." oninput="renderDoc()" style="resize:vertical;"></textarea>
+      </div>
 
-      <button class="btn-gen" onclick="downloadPDF()">📥 הורדת PDF</button>
+      <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
     </div>
 
     <!-- PREVIEW -->
@@ -321,7 +346,6 @@ try {
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 "use strict";
 
@@ -359,50 +383,53 @@ function renderDoc() {
   const hours  = v('a2hours');
   const price  = v('a2price');
   const extra  = v('a2extra');
+  const usage  = v('a2usage');
+  const req    = v('a2req');
 
-  g('doc2').innerHTML = `
+  const html = `
 <div class="doc-title">הסכם מתן שירותים</div>
-<div style="margin-bottom: 20px; font-weight: 700;">שנערך ונחתם בתאריך: ${fv(date, '_________')}</div>
+<div style="text-align:center; margin-bottom: 20px;">שנערך ונחתם בתאריך ${fv(date, '_________')}</div>
 
-<div style="margin-bottom: 15px; font-weight: bold; text-decoration: underline;">ב י ן</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:20px;">ב י ן</div>
 
-<div style="margin-bottom: 25px;">
+<div style="text-align:center; margin-bottom: 20px;">
   בעל הנכס <strong>${fv(oname, '____________________')}</strong><br>
   ת.ז <strong>${fv(oid, '____________________')}</strong><br>
   בכתובת: <strong>${fv(addr, '____________________')}</strong><br>
-  (להלן: "בעל הנכס") <br>
-  <strong style="margin-right: 40px;">מצד אחד;</strong>
+  (להלן: "בעל הנכס")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">מצד אחד</div>
 </div>
 
-<div style="margin-bottom: 15px; font-weight: bold; text-decoration: underline;">ל ב י ן</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:20px;">ל ב י ן</div>
 
-<div style="margin-bottom: 25px;">
-  <strong>איתי ראובני – <span style="letter-spacing:1px">LOCK AND ACTION</span></strong><br>
-  ע.מ. 208777367<br>
-  מרח' שניר 112, כפר ורדים<br>
-  (להלן: "ספק השירותים" או "השלוח") <br>
-  <strong style="margin-right: 40px;">מצד שני;</strong>
+<div style="text-align:center; margin-bottom: 30px;">
+  <strong>איתי ראובני – lock And Action</strong><br>
+  ע.מ 208777367<br>
+  מרחוב שניר 112, כפר ורדים<br>
+  (להלן: "ספק השירותים" או "השלוח")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">מצד שני</div>
 </div>
 
-<div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו (להלן "הלקוחות" וכל אחד מהם "לקוח") שירותי איתור לוקיישנים ואובייקטים שונים לימי צילום, בהתאם לבקשת לקוחותיו, הכולל ליווי שוטף של הלקוח לרבות לימי הביקור וכן התקשרות בהסכם עם בעל הנכס כשלוח וכנציג מטעם הלקוח ("השירותים");</div>
-<div class="clause"><strong>והואיל:</strong> ובעל הנכס, הינו הבעלים החוקי והמחזיק הבלעדי של הנכס המפורט בנספח א' ("הנכס");</div>
-<div class="clause"><strong>והואיל:</strong> ובעל הנכס מעוניין להתקשר עם השלוח, אשר מהווה את שלוחו של הלקוח ופועל מטעמו, ולספק ללקוח זכות שימוש בנכס, והשלוח מעוניין להתקשר עם בעל הנכס, כשלוחו ומטעמו של הלקוח, והכל בהתאם ובכפוף לתנאים ולמגבלות המפורטים בהסכם זה;</div>
-<div class="clause" style="margin-bottom: 25px;"><strong>והואיל:</strong> וברצון הצדדים להסדיר את היחסים המשפטיים ביניהם, והכל כמפורט בהסכם זה;</div>
 
-<div style="margin-bottom: 15px;"><strong>לפיכך הוצהר, הותנה והוסכם בין הצדדים כדלקמן:</strong></div>
+<div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו (להלן "הלקוחות" וכל אחד מהם "לקוח") שירותי  איתור לוקיישנים ואובייקטים שונים לימי צילום, בהתאם לבקשת לקוחותיו&rlm;, הכולל ליווי שוטף של הלקוח לרבות לימי הביקור וכן התקשרות בהסכם עם בעל הנכס כשלוח וכנציג מטעם הלקוח ("השירותים");&rlm;</div>
+<div class="clause"><strong>והואיל:</strong> ובעל הנכס&rlm;, הינו הבעלים החוקי והמחזיק הבלעדי של הנכס המפורט בנספח א' ("הנכס");&rlm;</div>
+<div class="clause"><strong>והואיל:</strong> ובעל הנכס מעוניין להתקשר עם השלוח&rlm;, אשר מהווה את שלוחו של הלקוח ופועל מטעמו, ולספק ללקוח זכות שימוש בנכס, והשלוח מעוניין להתקשר עם בעל הנכס, כשלוחו ומטעמו של הלקוח, והכל בהתאם ובכפוף לתנאים ולמגבלות המפורטים בהסכם זה;&rlm;</div>
+<div class="clause" style="margin-bottom: 25px;"><strong>והואיל:</strong> וברצון הצדדים להסדיר את היחסים המשפטיים ביניהם, והכל כמפורט בהסכם זה;&rlm;</div>
+
+<div style="margin-bottom: 15px;"><strong>לפיכך הוצהר&rlm;, הותנה והוסכם בין הצדדים כדלקמן:</strong></div>
 
 <div class="clause"><strong>1. הגדרות ופרשנות</strong></div>
-<div class="clause">1.1. חלוקתו של הסכם זה לסעיפים ומתן כותרות לסעיפים נעשו כמראי מקום בלבד, ואין להשתמש בהם לצרכי פרשנות.</div>
+<div class="clause">1.1. חלוקתו של הסכם זה לסעיפים ומתן כותרות לסעיפים נעשו כמראי מקום בלבד&rlm;, ואין להשתמש בהם לצרכי פרשנות.</div>
 <div class="clause" style="margin-bottom: 15px;">1.2. המבוא להסכם זה מהווה חלק בלתי נפרד הימנו.</div>
 
 <div class="clause"><strong>2. מהות ההסכם</strong></div>
 <div class="clause">2.1. השלוח, במסגרת תפקידו כשלוח עבור הלקוח, מזמין בזאת מבעל הנכס את השימוש בנכס לצורך ביצוע יום צילומים בהתאם ובכפוף לתנאים ולמגבלות המפורטים בהסכם זה.</div>
-<div class="clause">2.2. הנכסים אשר את השימוש בהם מעוניין השלוח להזמין מבעל הנכס, לרבות זמני השימוש בהם, מצ"ב להלן כנספח א'.</div>
-<div class="clause">2.3. מובהר לבעל הנכס והוא מאשר כי כל טענה תביעה או דרישה שתהא לו למול לקוח, לרבות כל סכסוך או מחלוקת ביניהם, תופנה ישירות ללקוח בהתאמה, ואינה באחריותו של ספק השירותים, לרבות כל טענה תביעה או דרישה שתהא לכל צד שלישי כנגד בעל הנכס בקשר עם השימוש שיבצע הלקוח בנכס. בעל הנכס ישפה ויפצה את ספק השירותים בגין כל נזק אובדן או חיוב שיגרמו לו עקב תביעה או דרישה מאת צד שלישי, לרבות הלקוח, שמקורה בשימוש בנכס על ידי הלקוח.</div>
-<div class="clause">2.4. ביטוח. בעל הנכס מתחייב כי הנכס מבוטח בפוליסת ביטוח בסכומים המקובלים בתעשיה בהתאם למפורט בנספח א'. בעל הנכס ימציא לספק השירותים אישור על קיום ביטוחים כאמור במעמד חתימת הסכם זה. מובהר כי העברת העתק מהפוליסה לספק השירותים לא תהווה כל מחויבות או אחריות מצד ספק השירותים או לאישורו כי הפוליסה תקינה או מכסה כיסוי מינימלי כלשהו, וכי החזקת פוליסה כאמור בתוקף לכל אורך תקופת ההסכם הינה תנאי חובה להסכם זה.</div>
-<div class="clause">2.5. בעל הנכס מתחייב כי לא יפנה ולא יקיים כל קשר עם לקוח אשר יבצע שימוש בנכס, אשר הופנה אליו על ידי ספק השירותים, ללא אישורו של ספק השירותים. בכל מקרה בו יתקשר בעל הנכס בעתיד עם כל לקוח כאמור, יהא זכאי ספק השירותים לקבל את הסכום המפורט בסעיף התמורה שבהסכם זה.</div>
-<div class="clause">2.6. ככל וימצא לקוח אשר מעוניין לבצע שימוש בנכס לצורך יום צילומים, יחתום בעל הנכס על נספח יציאה לסיור בנוסח המצ"ב להלן כנספח ב', ויערך סיור מקדים בהשתתפות הלקוח, בו יוכל הלקוח לראות את הנכס.</div>
-<div class="clause">2.7. בעל הנכס מצהיר ומתחייב כי ידוע לו כי לאחר החתימה על הסכם זה, לא ניתן יהיה לבצע שינוי בו על ידי בעל הנכס, וידוע לו כי על סמך האמור בהסכם זה, מתחייב השלוח בהסכם מול הלקוח. ככל שיבקש השלוח לבצע שינוי בתנאי הסכם זה לאחר חתימתו, עקב בקשה שמקורה בדרישות הלקוח, אזי יפנה לבעל הנכס ובעל הנכס לא יסרב לשינוי כאמור אלא מנימוקים סבירים.</div>
+<div class="clause">2.2. הנכסים אשר את השימוש בהם מעוניין השלוח להזמין מבעל הנכס&rlm;, לרבות זמני השימוש בהם, מצ"ב להלן כנספח א'.</div>
+<div class="clause">2.3. מובהר לבעל הנכס והוא מאשר כי כל טענה תביעה או דרישה שתהא לו למול לקוח, לרבות כל סכסוך או מחלוקת ביניהם, תופנה ישירות ללקוח בהתאמה&rlm;, ואינה באחריותו של ספק השירותים, לרבות כל טענה תביעה או דרישה שתהא לכל צד שלישי כנגד בעל הנכס בקשר עם השימוש שיבצע הלקוח בנכס. בעל הנכס ישפה ויפצה את ספק השירותים בגין כל נזק אובדן או חיוב שיגרמו לו עקב תביעה או דרישה מאת צד שלישי, לרבות הלקוח&rlm;, שמקורה בשימוש בנכס על ידי הלקוח.</div>
+<div class="clause">2.4. ביטוח. בעל הנכס מתחייב כי הנכס מבוטח בפוליסת ביטוח בסכומים המקובלים בתעשיה בהתאם למפורט בנספח א'. בעל הנכס ימציא לספק השירותים אישור על קיום ביטוחים כאמור במעמד חתימת הסכם זה. מובהר כי העברת העתק מהפוליסה לספק השירותים לא תהווה כל מחויבות או אחריות מצד ספק השירותים או לאישורו כי הפוליסה תקינה או מכסה כיסוי מינימלי כלשהו&rlm;, וכי החזקת פוליסה כאמור בתוקף לכל אורך תקופת ההסכם הינה תנאי חובה להסכם זה.</div>
+<div class="clause">2.5. בעל הנכס מתחייב כי לא יפנה ולא יקיים כל קשר עם לקוח אשר יבצע שימוש בנכס, אשר הופנה אליו על ידי ספק השירותים, ללא אישורו של ספק השירותים. בכל מקרה בו יתקשר בעל הנכס בעתיד עם כל לקוח כאמור&rlm;, יהא זכאי ספק השירותים לקבל את הסכום המפורט בסעיף התמורה שבהסכם זה.</div>
+<div class="clause">2.6. ככל וימצא לקוח אשר מעוניין לבצע שימוש בנכס לצורך יום צילומים, יחתום בעל הנכס על נספח יציאה לסיור בנוסח המצ"ב להלן כנספח ב'&rlm;, ויערך סיור מקדים בהשתתפות הלקוח&rlm;, בו יוכל הלקוח לראות את הנכס.</div>
+<div class="clause">2.7. בעל הנכס מצהיר ומתחייב כי ידוע לו כי לאחר החתימה על הסכם זה, לא ניתן יהיה לבצע שינוי בו על ידי בעל הנכס&rlm;, וידוע לו כי על סמך האמור בהסכם זה, מתחייב השלוח בהסכם מול הלקוח. ככל שיבקש השלוח לבצע שינוי בתנאי הסכם זה לאחר חתימתו, עקב בקשה שמקורה בדרישות הלקוח, אזי יפנה לבעל הנכס ובעל הנכס לא יסרב לשינוי כאמור אלא מנימוקים סבירים.</div>
 <div class="clause" style="margin-bottom: 15px;">2.8. מובהר לבעל הנכס כי כל סטיה או אי התאמה שתהיה בנכס ביחס להזמנה, תיפתר בין בעל הנכס והלקוח בלבד, למעט אם מקורה ברשלנותו של ספק השירותים או בזדון.</div>
 
 <div class="clause"><strong>3. הצהרות הצדדים</strong></div>
@@ -423,17 +450,17 @@ function renderDoc() {
 <div class="clause" style="margin-bottom: 15px;">5.2. כל צד יהיה רשאי להפסיק את ההתקשרות בהסכם זה, במידה והפר הצד השני את הסכם זה הפרה מהותית, ולא תיקן את ההפרה בתוך 14 ימים ממועד קבלת הודעה בכתב מהצד הניפר באמצעות דואר אלקטרוני, אודות ההפרה.</div>
 
 <div class="clause"><strong>6. סודיות</strong></div>
-<div class="clause" style="margin-bottom: 15px;">כל צד מצהיר ומתחייב כי במשך תקופת ההתקשרות וכן לאחריה (ללא הגבלת זמן), הוא ישמור בסודיות מוחלטת ולא יבצע כל שימוש בכל מידע או ידיעות הקשורים, במישרין או בעקיפין, לעסקיו ו/או פעילותו של הצד השני, וכל מידע הקשור אליו ו/או לחוג לקוחותיו ו/או ספקיו, ו/או לעסקים הקשורים בצורה כלשהי לצד השני, לרבות מידע או ידע טכני, עסקי, כלכלי, מסחרי או אחר, לרבות סכומי התשלום ששולמו על ידי ספק השירותים ו/או מידע אשר הגיע אליו ו/או לרשותו במהלך או עקב התקשרותו בהסכם זה ולרבות תוכן הסכם זה, למעט מידע אשר הינו בנחלת הכלל ו/או אשר היה בידיעתו של אותו צד בטרם ההתקשרות בהסכם זה, ו/או אשר התגלה לו שלא במסגרת הסכם זה. כמו כן מתחייב בעל הנכס כי ישמור בסוד ולא יגלה כל מידע סודי השייך לבעל הנכס או שהתגלה לו במסגרת השימוש בנכס.</div>
+<div class="clause" style="margin-bottom: 15px;">כל צד מצהיר ומתחייב כי במשך תקופת ההתקשרות וכן לאחריה (ללא הגבלת זמן), הוא ישמור בסודיות מוחלטת ולא יבצע כל שימוש בכל מידע או ידיעות הקשורים, במישרין או בעקיפין, לעסקי ו ו/או פעילותו של הצד השני, וכל מידע הקשור אליו ו/או לחוג לקוחות יו ו/או ספקיו, ו/או לעסקים הקשורים בצורה כלשהי לצד השני, לרבות מידע או ידע טכני, עסקי, כלכלי, מסחרי או אחר, לרבות סכומי התשלום ששולמו על ידי ספק השירותים ו/או מידע אשר הגיע אליו ו/או לרשותו במהלך או עקב התקשרותו בהסכם זה ולרבות תוכן הסכם זה, למעט מידע אשר הינו בנחלת הכלל ו/או אשר היה בידיעתו של אותו צד בטרם ההתקשרות בהסכם זה, ו/או אשר התגלה לו שלא במסגרת הסכם זה. כמו כן מתחייב בעל הנכס כי ישמור בסוד ולא יגלה כל מידע סודי השייך לבעל הנכס או שהתגלה לו במסגרת השימוש בנכס.</div>
 
 <div class="clause"><strong>7. היעדר אחריות</strong></div>
-<div class="clause">7.1. ספק השירותים אינו מספק כל מצג או התחייבות הנוגעת ללקוח בקשר עם סוג השימוש בנכס, מטרתו או כמות האנשים שיבצעו שימוש, וכל מידע אשר יספק לבעל הנכס הינו בהתאם לידיעתו בלבד, לא נבדק ואינו ודאי. באחריות בעל הנכס לוודא כל מידע אשר ברצונו לדעת אודות השימוש בנכס, לשאול את כל השאלות ולקבל את כל התשובות לשביעות רצונו המלאה.</div>
+<div class="clause">7.1. ספק השירותים אינו מספק כל מצג או התחייבות הנוגעת ללקוח בקשר עם סוג השימוש בנכס ,מטרתו או כמות האנשים שיבצעו שימוש, וכל מידע אשר יספק לבעל הנכס הינו בהתאם לידיעתו בלבד, לא נבדק ואינו ודאי. באחריות בעל הנכס לוודא כל מידע אשר ברצונו לדעת אודות השימוש בנכס, לשאול את כל השאלות ולקבל את כל התשובות לשביעות רצונו המלאה.</div>
 <div class="clause" style="margin-bottom: 15px;">7.2. ספק השירותים ו/או מי מטעמו לא יהיה אחראי בשום מקרה לנזקים שיגרמו לבעל הנכס או למי מטעמו בקשר עם השירותים על פי הסכם זה לרבות לנזקים ישירים, עקיפים תוצאתיים או נסיבתיים או כל נזק אחר מכל מין וסוג שהוא הנובעים או הקשורים לביצוע הסכם זה, או לכל מעשה או מחדל אחר של ספק השירותים או לקוחותיו של ספק השירותים, בין שהדבר מבוסס על חוזה, ובין על דיני נזיקין, אחריות מוחלטת או כל דבר אחר היום או בעתיד.</div>
 
 <div class="clause"><strong>8. שונות</strong></div>
 <div class="clause">8.1. ספק השירותים מצהיר, כי ידוע לו שהסכם זה הינו הסכם למתן השירותים בלבד, ואין בו כדי ליצור בינו לבין בעל הנכס יחסי עובד-מעביד ואין הוא מקנה לו זכויות כלשהן מלבד אלה המפורטות בהסכם זה.</div>
 <div class="clause">8.2. הסכם זה מבטא את כל ההסכמות באופן מלא וממצה בין הצדדים לגבי הנושאים או העניינים הנדונים בו, והוא מחליף ומבטל כל מצג, הסכם, משא ומתן, נוהג, זיכרון דברים, הצעות, סיכומי דיון, מכתבי כוונות ו/או התחייבות, וכל מסמך אחר, ששררו או שהוחלפו בין הצדדים (בין בכתב ובין בעל-פה) בנושאים או בעניינים האמורים, עובר לחתימתו של הסכם זה.</div>
 <div class="clause">8.3. כל שינוי או ביטול של הוראה מהוראות הסכם זה ייעשה בכתב ובחתימת הצדדים.</div>
-<div class="clause" style="margin-bottom: 25px;">8.4. הודעות בקשר להסכם זה תשלחנה בדואר רשום או בדואר אלקטרוני או תימסרנה ביד על-פי מעני הצדדים הנקובים במבוא להסכם זה (או כל מען אחר עליו תבוא הודעה מתאימה בכתב), ויראו כל הודעה כאמור כאילו נמסרה לנמענה במוקדם שבין המועדים הבאים: עם מסירתה בפועל (או הצעתה לנמען במקרה של סירוב לקבלה), או עם עבור יום עסקים אחד ממועד שיגורה בדואר אלקטרוני, או שלושה (3) ימי עסקים מהמועד בו נמסרה למשלוח בדואר רשום, למעט הודעה בדבר שינוי מען אשר יראוה כנמסרת רק עם מסירתה בפועל לידי הנמען.</div>
+<div class="clause" style="margin-bottom: 25px;">8.4. הודעות בקשר להסכם זה תשלחנה בדואר רשום או בדואר אלקטרוני או תימסרנה ביד על-פי מעני הצדדים הנקובים במבוא להסכם זה (או כל מען אחר עליו תבוא הודעה מתאימה בכתב&rlm;), ויראו כל הודעה כאמור כאילו נמסרה לנמענה במוקדם שבין המועדים הבאים: עם מסירתה בפועל (או הצעתה לנמען במקרה של סירוב לקבלה&rlm;), או עם עבור יום עסקים אחד ממועד שיגורה בדואר אלקטרוני, או שלושה (3&rlm;) ימי עסקים מהמועד בו נמסרה למשלוח בדואר רשום, למעט הודעה בדבר שינוי מען אשר יראוה כנמסרת רק עם מסירתה בפועל לידי הנמען.</div>
 
 <div style="margin-bottom: 20px;"><strong>ולראיה באו הצדדים על החתום :</strong></div>
 
@@ -450,15 +477,15 @@ function renderDoc() {
 
 <div class="page-break"></div>
 
-<div class="doc-title" style="text-decoration:none; text-align:right;"><strong>נספח א' - לוקיישן</strong></div>
-<div style="font-weight:700; text-decoration:underline; margin-bottom:15px;">נוסח הזמנה</div>
+<div class="doc-title" style="text-decoration:none; text-align:center;"><strong>נספח א' - לוקיישן</strong></div>
+<div style="font-weight:700; text-decoration:underline; margin-bottom:15px; text-align:center;">נוסח הזמנה</div>
 
 <div class="clause" style="line-height:2.2;">
 בעל הנכס מאשר בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא בכתובת: ${fv(addr, '____________________')} ("הנכס") לרבות כל תכולת הנכס, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך: ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
 </div>
 
-<div class="clause">השימוש אשר יערך בנכס הינו כדלהלן: <span class="fv">____________________________________</span></div>
-<div class="clause">דרישות נוספות הקשורות לנכס הינן כדלהלן: <strong>שטיפה וניקיון.</strong></div>
+<div class="clause">השימוש אשר יערך בנכס הינו כדלהלן: ${fv(usage, '____________________________________')}</div>
+<div class="clause">דרישות נוספות הקשורות לנכס הינן כדלהלן: <strong>שטיפה וניקיון${req ? '. ' + req : '.'}</strong></div>
 <div class="clause">בעל הנכס מאשר כי הינו הבעלים החוקי והמחזיק הבלעדי של הנכס.</div>
 <div class="clause">בעל הנכס מצהיר ומתחייב כי הנכס מבוטח בביטוח מבנה וביטוח תכולה וכן ביטוח צד שלישי בסכומים המקובלים בתעשיה. בעל הנכס יציג העתק של פוליסות הביטוח על פי דרישה.</div>
 <div class="clause" style="line-height:2.2;">התמורה בגין השימוש בנכס תהיה כדלהלן: בגין ${fv(hours, 'X')} שעות ישולם לבעל הנכס סכום של ₪${fv(price, 'Y')}. בגין כל שעה נוספת ישולם לבעל הנכס סכום של ₪${fv(extra, 'Z')}.</div>
@@ -478,34 +505,11 @@ function renderDoc() {
   </tr>
 </table>
 `;
+  g('doc2').innerHTML = html;
 }
 
 function downloadPDF() {
-  const el = document.getElementById('doc2');
-  if (!el || typeof html2pdf === 'undefined') {
-    alert('ספריית PDF לא נטענה. אנא בדוק חיבור אינטרנט ונסה שוב.');
-    return;
-  }
-  
-  const scroller = el.closest('.doc-scroll');
-  const prevMH = scroller ? scroller.style.maxHeight : null;
-  const prevOF = scroller ? scroller.style.overflowY : null;
-  if (scroller) { scroller.style.maxHeight = 'none'; scroller.style.overflowY = 'visible'; }
-
-  const opts = {
-    margin: [15, 15, 15, 15],
-    filename: 'הסכם_בעל_נכס_לאיתי.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opts).from(el).save().then(() => {
-    if (scroller) {
-      scroller.style.maxHeight = prevMH;
-      scroller.style.overflowY = prevOF;
-    }
-  });
+  window.print();
 }
 </script>
 </body>

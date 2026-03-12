@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>הסכם 1 - בעל נכס למזמין</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --navy:#0f2647; --blue:#1a3a6b; --gold:#c8a84b; --goldlt:#f0d86e; --bg:#0d1c35; --white:#ffffff; --offwh:#f7f8fc; --text:#1e2b3c; --muted:#6b7a8d; --border:#dde2ea; --radius:16px; --shadow:0 8px 40px rgba(0,0,0,.22); }
+    body { font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif; background: linear-gradient(160deg, var(--bg) 0%, var(--blue) 100%); min-height: 100vh; color: var(--text); direction: rtl; }
+    .site-header { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; background: rgba(15,38,71,.88); border-bottom: 1px solid rgba(200,168,75,.25); z-index:200; }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-icon { width: 46px; height: 46px; background: linear-gradient(135deg, var(--gold), var(--goldlt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .logo-title { color: var(--white); font-size: 18px; font-weight: 700; }
+    .logo-sub { color: var(--gold); font-size: 12px; }
+    #backBtn { padding: 8px 22px; background: transparent; border: 1.5px solid var(--gold); color: var(--gold); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: .2s; }
+    #backBtn:hover { background: var(--gold); color: var(--navy); }
+    .page { padding: 36px 20px 60px; min-height: calc(100vh - 74px); display: block; }
+    .editor-wrap { display: grid; grid-template-columns: 370px 1fr; gap: 28px; max-width: 1220px; margin: 0 auto; align-items: start; }
+    @media (max-width: 880px) { .editor-wrap { grid-template-columns: 1fr; } }
+    .form-panel { background: var(--white); border-radius: var(--radius); padding: 28px 24px; box-shadow: var(--shadow); position: sticky; top: 88px; }
+    .form-panel > h2 { font-size: 1.25rem; color: var(--blue); border-bottom: 3px solid var(--gold); padding-bottom: 12px; margin-bottom: 4px; }
+    .form-panel > .fp-sub { color: var(--muted); font-size: .83rem; margin-bottom: 22px; }
+    .sec-title { font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--blue); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+    .sec-title::after { content:''; flex:1; height:1px; background: rgba(26,58,107,.18); }
+    .frow { margin-bottom: 12px; }
+    .frow label { display:block; font-size:.82rem; font-weight:600; color:#556; margin-bottom:5px; }
+    input[type=text], input[type=number], select { width:100%; padding:9px 13px; border:1.5px solid var(--border); border-radius:9px; font-family:inherit; font-size:.93rem; color: var(--text); background: var(--offwh); direction:rtl; outline:none; transition: .2s; }
+    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,58,107,.1); background:#fff; }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .id-wrap { display:flex; gap:8px; }
+    .id-wrap select { width:105px; flex-shrink:0; }
+    .btn-gen { width:100%; margin-top:16px; padding:13px; background: linear-gradient(135deg, var(--blue), #2a5298); color:#fff; border:none; border-radius:12px; font-size:.97rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px; box-shadow: 0 5px 18px rgba(26,58,107,.32); }
+    .btn-gen:hover { transform:translateY(-2px); }
+    .preview-panel { background: var(--white); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow); }
+    .preview-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid #eef0f5; }
+    .preview-top h3 { color: var(--blue); font-size:1rem; }
+    .btn-pdf { padding:9px 22px; background: linear-gradient(135deg, var(--gold), var(--goldlt)); color: var(--navy); border:none; border-radius:9px; font-size:.9rem; font-weight:700; cursor:pointer; box-shadow:0 3px 12px rgba(200,168,75,.35); transition:.2s; }
+    .btn-pdf:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(200,168,75,.45); }
+    
+    .doc-scroll { max-height: 72vh; overflow-y:auto; border:1px solid #e8eaf0; border-radius:12px; padding: 20px; background: #6b7a8d; display: flex; justify-content: center;}
+    
+    /* PDF Container strictly constrained for Perfect RTL Center */
+    #doc-container {
+        width: 210mm; 
+        min-height: 297mm;
+        padding: 20mm; 
+        background: #ffffff;
+        box-shadow: 0px 5px 20px rgba(0,0,0,0.15);
+        position: relative;
+        direction: rtl;
+        text-align: right;
+        font-family: Tahoma, sans-serif;
+        font-size: 11pt; 
+        line-height: 1.5; 
+        color: #111;
+        box-sizing: border-box;
+    }
+
+    .doc-title { text-align:center; font-size:20px; font-weight:700; margin-bottom:10px; }
+    
+    /* Bolding user data safely */
+    .dynamic-val { display:inline-block; font-weight:bold; padding:0 3px; min-width:30px; white-space:nowrap; }
+
+    /* Fix bullet margins in PDF */
+    .ag-list-item { margin-bottom: 4px; padding-right: 16px; text-indent: -16px; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">📋</div>
+      <div><div class="logo-title">איתי ראובני</div><div class="logo-sub">יצירת הסכמים</div></div>
+    </a>
+    <a id="backBtn" href="index.html">← חזרה לדף הבית</a>
+  </header>
+
+  <section class="page">
+    <div class="editor-wrap">
+      
+      <!-- FORM -->
+      <div class="form-panel">
+        <h2>מילוי פרטי ההסכם</h2>
+        <p class="fp-sub">הסכם בין בעל נכס למזמין</p>
+
+        <div class="sec-title">תאריך וזמן</div>
+        <div class="frow"><label>תאריך ההסכם (למעלה)</label><input id="a1date" type="text" placeholder="הזן תאריך (DD/MM/YYYY) או לחץ לבחירה..." /></div>
+        <div class="frow"><label>תאריך הפעילות (בגוף ההסכם)</label><input id="a1date2" type="text" placeholder="הזן תאריך (DD/MM/YYYY) או לחץ לבחירה..." /></div>
+        <div class="row2">
+          <div class="frow"><label>שעת התחלה</label><input id="a1tstart" type="text" placeholder="HH:MM" readonly /></div>
+          <div class="frow"><label>שעת סיום</label><input id="a1tend" type="text" placeholder="HH:MM" readonly /></div>
+        </div>
+
+        <div class="sec-title">בעל הנכס</div>
+        <div class="frow"><label>שם בעל הנכס</label><input id="a1oname" type="text" placeholder="שם מלא..." oninput="render1()" /></div>
+        <div class="frow">
+          <label>מספר מזהה</label>
+          <div class="id-wrap">
+            <select id="a1oidtype" onchange="render1()">
+              <option value="ת.ז.">ת.ז.</option>
+              <option value="ח.פ.">ח.פ.</option>
+              <option value="ע.מ.">ע.מ.</option>
+            </select>
+            <input id="a1oid" type="text" placeholder="מספר..." oninput="render1()" />
+          </div>
+        </div>
+
+        <div class="sec-title">המזמין</div>
+        <div class="frow"><label>שם המזמין</label><input id="a1cname" type="text" placeholder="שם מלא..." oninput="render1()" /></div>
+        <div class="frow"><label>תעודת זהות</label><input id="a1cid" type="text" placeholder="מספר ת.ז. ..." oninput="render1()" /></div>
+
+        <div class="sec-title">פרטי הנכס</div>
+        <div class="frow">
+          <label>סוג הנכס</label>
+          <select id="a1ptype" onchange="render1()">
+            <option value="">בחר...</option><option>דירה</option><option>בית פרטי</option>
+            <option>פנטהאוז</option><option>דופלקס</option><option>וילה</option>
+            <option>סטודיו</option><option>חדר</option><option>נכס מסחרי</option>
+          </select>
+        </div>
+        <div class="frow"><label>כתובת הנכס</label><input id="a1addr" type="text" placeholder="רחוב, מספר, עיר..." oninput="render1()" /></div>
+
+        <div class="sec-title">צוות ומטרה</div>
+        <div class="frow"><label>מספר אנשי צוות (מקסימום)</label><input id="a1crew" type="number" placeholder="מספר אנשים..." min="1" max="50" oninput="render1()" /></div>
+        <div class="frow">
+          <label>מטרה</label>
+          <select id="a1purp" onchange="togglePurp1()">
+            <option value="">בחר...</option>
+            <option>שיווק הנכס למכירה</option>
+            <option>שיווק הנכס להשכרה</option>
+            <option>תיעוד אדריכלי</option>
+            <option>פרסום שיווקי</option>
+            <option value="__other__">אחר (הכנס ידנית)</option>
+          </select>
+          <input id="a1purpcustom" type="text" placeholder="הכנס מטרה..." oninput="render1()" style="margin-top:8px; display:none;" />
+        </div>
+
+        <button class="btn-gen" onclick="downloadPDF()">📥 הורדת PDF</button>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-panel">
+        <div class="preview-top">
+          <h3>תצוגה מקדימה</h3>
+          <button class="btn-pdf" onclick="downloadPDF()">📥 הורד PDF</button>
+        </div>
+        <div class="doc-scroll">
+          <div id="doc-container"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    "use strict";
+
+    function g(id) { return document.getElementById(id); }
+    function v(id) { const el = g(id); return el ? el.value.trim().replace(/ /g, '&nbsp;') : ''; }
+    function fv(val, ph) {
+      const p = (ph && !ph.includes('_')) ? ph : '';
+      if (!val) return `&nbsp;<b class="dynamic-val" style="color:#bbb;">${p}</b>&nbsp;`;
+      return `&nbsp;<b class="dynamic-val">${val}</b>&nbsp;`;
+    }
+    function hebDate(str) {
+      if (!str) return null;
+      let d, m, y;
+      if (str.includes('/')) {
+        [d, m, y] = str.split('/');
+      } else {
+        [y, m, d] = str.split('-');
+      }
+      d = d.padStart(2, '0');
+      m = m.padStart(2, '0');
+      return `${d}/${m}/${y}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      flatpickr('#a1date', { locale: 'he', dateFormat: 'd/m/Y', allowInput: true, onChange: render1 });
+      flatpickr('#a1date2', { locale: 'he', dateFormat: 'd/m/Y', allowInput: true, onChange: render1 });
+      flatpickr('#a1tstart', { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true, defaultHour: 9, defaultMinute: 0, onChange: render1 });
+      flatpickr('#a1tend', { enableTime: true, noCalendar: true, dateFormat: 'H:i', time_24hr: true, defaultHour: 17, defaultMinute: 0, onChange: render1 });
+      render1();
+    });
+
+    function togglePurp1() {
+      const sel = v('a1purp');
+      g('a1purpcustom').style.display = (sel === '__other__') ? 'block' : 'none';
+      render1();
+    }
+    function getPurp1() {
+      const s = v('a1purp');
+      return s === '__other__' ? v('a1purpcustom') : s;
+    }
+
+    function render1() {
+      const hdate = hebDate(v('a1date')), hdate2 = hebDate(v('a1date2')), ts = v('a1tstart'), te = v('a1tend');
+      const oname = v('a1oname'), oidtype = v('a1oidtype') || 'ת.ז.', oid = v('a1oid');
+      const cname = v('a1cname'), cid = v('a1cid'), ptype = v('a1ptype'), addr = v('a1addr');
+      const purp = getPurp1(), crew = v('a1crew');
+
+      g('doc-container').innerHTML = `
+<!-- Header -->
+<div style="position:relative; margin-bottom:12px; font-size:11pt; border:none;">
+  <span style="float:right; white-space:nowrap;">לכבוד:<br/>${fv(cname,'המזמין')}</span>
+  <span style="float:left; white-space:nowrap;">${fv(hdate)}</span>
+  <div style="clear:both;"></div>
+</div>
+<div style="margin-bottom:12px; font-size:11pt; white-space:nowrap;">סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}</div>
+
+<div class="doc-title" style="margin-bottom:10px;">הסכם שימוש בלוקיישן "${fv(ptype,'סוג בית')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}"</div>
+
+<!-- Intro -->
+<div style="margin-bottom:10px;">
+<strong>בין</strong> ${fv(oname,'_____')}&nbsp;${oidtype}&nbsp;${fv(oid,'_____')}&nbsp;– להלן "חברת&nbsp;ההפקה" או&nbsp;"הלקוח"<br/>
+<strong>לבין</strong> ${fv(cname,'_____')}&nbsp;ת.ז&nbsp;${fv(cid,'_____')},&nbsp;סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')} - להלן&nbsp;"הלוקיישן".&rlm;<br/>
+הח"מ מצהיר/ה שהיא מטעם סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')},&rlm; אשר&nbsp;מנוהל ע"י&nbsp;בעל&nbsp;הנכס,&rlm; וכי&nbsp;חתימתה מחייבת את שותפיו וכן&nbsp;את&nbsp;הנכס.&rlm;
+</div>
+
+<div style="margin-bottom:10px;">
+חברת&nbsp;ההפקה ו/או "הלקוח" שוכרת את הנכס סוג בית&nbsp;${fv(ptype,'_____')}&nbsp;בכתובת&nbsp;${fv(addr,'_____')}&nbsp;בתאריך&nbsp;${fv(hdate2)}<br/>
+בין השעות&nbsp;${fv(ts,'__:__')} - ${fv(te,'__:__')}.&rlm;<br/>
+בגין כל שעה נוספת יתבצע תשלום כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm;<br/>
+<strong>מטרת&nbsp;הצילומים</strong>&nbsp;<span style="display:inline-block; border-bottom:1px solid #111; padding:0 5px;">${purp ? purp.replace(/ /g, '&nbsp;') : '<span style="color:#bbb;">_____</span>'}</span>
+</div>
+
+<div style="margin-bottom:10px;">
+צוות ההפקה – עד&nbsp;${fv(crew,'X')}&nbsp;אנשים.&rlm; על כל איש צוות נוסף יתבצע תשלום נוסף כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm; מוסכם בזאת שלצורך&nbsp;הצילומים&nbsp;הבית&nbsp;והחצר&nbsp;יעמוד&nbsp;לרשות&nbsp;הלקוח.&rlm;
+</div>
+
+<!-- Terms -->
+<div style="margin-bottom:10px;">
+הנכס&nbsp;יימסר&nbsp;לידי&nbsp;הלקוח&nbsp;כאשר&nbsp;הינו&nbsp;נקי.&rlm;
+</div>
+
+<div style="margin-bottom:10px;">
+חברת&nbsp;ההפקה מתחייבת להחזיר את&nbsp;המצב&nbsp;לקדמותו&nbsp;בגמר&nbsp;יום&nbsp;הצילום.&rlm;<br/>
+וכן חברת&nbsp;ההפקה מתחייבת לשאת באחריות מלאה לכל&nbsp;נזק&nbsp;במידה&nbsp;ויגרם&nbsp;למקום&nbsp;בעקבות&nbsp;ובמהלך יום&nbsp;הצילום&nbsp;והחזרות.&rlm;<br/>
+<span style="color:red !important;">הלקוח יבטח סיכוניו בקשר עם יום הצילומים,&rlm; ביטוח לעובדים ולציוד לרבות ביטוח צד&nbsp;ג'.&rlm; הלקוח אחראי&nbsp;לביטוח&nbsp;הנכס או תכולתו ביום הצילום בגין נזקים שיעשו למושכר ביום הצילומים,&rlm; שריפה&nbsp;וכו'.&rlm; המשכיר אינו אחראי&nbsp;לרכוש&nbsp;המפיק עובדיו ואורחיו ואינו נושא באחריות על כל נזק&nbsp;או&nbsp;פגיעה שעלולים להגרם למפיק,&rlm; עובדיו&nbsp;או&nbsp;אורחיו&nbsp;במהלך&nbsp;שהותם&nbsp;במקום.&rlm;</span>
+</div>
+
+<div style="margin-bottom:6px;">את התמורה בגין יום הצילום יקבל בעל הנכס מאיתי ראובני "<span style="letter-spacing:1px">LOCK AND ACTION</span>" אשר&nbsp;הינה&nbsp;קשורה&nbsp;עימו&nbsp;בחוזה&nbsp;תמורה.&rlm;</div>
+<div style="margin-bottom:10px;">המשכיר יספק נציג צמוד מטעם הבית&nbsp;שילווה&nbsp;את&nbsp;הלקוח&nbsp;לאורך&nbsp;הצילומים.&rlm;</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:10px;" dir="rtl">
+  <tr>
+    <td style="width:18px; vertical-align:top;">&bull;</td>
+    <td>יתאפשר להכניס לבית ציוד&nbsp;צילום,&rlm; תאורה,&rlm; הפקה&nbsp;וארט.&rlm;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;">&bull;</td>
+    <td>יתאפשר לפתוח ארוחת בוקר וצהרים בחצר&nbsp;הבית&nbsp;או&nbsp;בפינת&nbsp;האוכל&nbsp;לצוות&nbsp;ההפקה.&rlm;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;">&bull;</td>
+    <td>יתאפשר&nbsp;להשתמש&nbsp;בחדרים&nbsp;למטרת&nbsp;איפור&nbsp;והלבשה.&rlm;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;">&bull;</td>
+    <td>יתאפשר להזיז&nbsp;חפצים&nbsp;שונים&nbsp;בבית&nbsp;למטרת&nbsp;הצילום&nbsp;ולהחזירם&nbsp;למקומם.&rlm;</td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;">&bull;</td>
+    <td>יתאפשר להשתמש בחשמל של הבית&nbsp;למטרת&nbsp;הצילומים.&rlm;</td>
+  </tr>
+</table>
+
+<div style="margin-bottom:6px;">חומר&nbsp;הגלם,&rlm; אופן השימוש בו ושיקולי העריכה הם של חברת&nbsp;ההפקה&nbsp;בלבד.&rlm;</div>
+<div style="margin-bottom:16px;">חברת&nbsp;ההפקה שומרת לעצמה&nbsp;את&nbsp;הזכות&nbsp;לביטול&nbsp;הצילומים.&rlm;</div>
+
+<div style="page-break-before: always;"></div>
+<br/>
+
+<!-- Signatures -->
+<div style="margin-bottom:10px; font-weight:700; margin-top:30px;">אנו&nbsp;הח"מ&nbsp;מאשרים&nbsp;את&nbsp;פרטי&nbsp;ההסכם</div>
+
+<div style="margin-top:30px; display:block; position:relative; width:100%; height:80px; page-break-inside:avoid;">
+  <div style="display:inline-block; width:45%; vertical-align:top; text-align:center; float:right;">
+    <div style="border-top:1px solid #333; padding-top:8px; font-size:11pt; color:#555;">
+      בעל הנכס ${oidtype} <strong>${fv(oid,'_____')}</strong><br/>${fv(oname,'שם בעל הנכס')}
+    </div>
+  </div>
+  <div style="display:inline-block; width:45%; vertical-align:top; text-align:center; float:left;">
+    <div style="border-top:1px solid #333; padding-top:8px; font-size:11pt; color:#555;">
+      המזמין ת.ז <strong>${fv(cid,'_____')}</strong><br/>${fv(cname,'שם המזמין')}
+    </div>
+  </div>
+  <div style="clear:both;"></div>
+</div>
+`.replace(/\n\s*/g, ' ');
+    }
+
+    function downloadPDF() {
+      const element = document.getElementById('doc-container');
+      const cname = v('a1cname') || 'הסכם';
+      
+      const devScroll = document.querySelector('.doc-scroll');
+
+      // איפוס גלילה מוחלט גם לדף וגם לתצוגה המקדימה 
+      // חובה כדי למנוע את "חיתוך" החלק העליון של ההסכם (כשהמשתמש גולל למטה)
+      window.scrollTo(0, 0);
+      if (devScroll) devScroll.scrollTop = 0;
+
+      // Temporarily remove constraints for perfect render
+      const prevBoxShadow = element.style.boxShadow;
+      const prevMargin = element.style.margin;
+      const prevMaxHeight = devScroll ? devScroll.style.maxHeight : '';
+      const prevOverflowY = devScroll ? devScroll.style.overflowY : '';
+
+      // Un-lock styling before rendering
+      element.style.boxShadow = 'none';
+      element.style.margin = '0'; // מונע קפיצות עקב המרכוז
+      
+      if (devScroll) {
+          devScroll.style.maxHeight = 'none';
+          devScroll.style.overflowY = 'visible';
+      }
+
+      setTimeout(() => {
+          const opt = {
+              margin: 0, 
+              filename: `הסכם_בעל_נכס_${cname}.pdf`,
+              image: { type: 'jpeg', quality: 1 },
+              html2canvas: { 
+                  scale: 3, 
+                  useCORS: true, 
+                  scrollY: 0
+              },
+              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
+
+          html2pdf().set(opt).from(element).save().then(() => {
+              // Restore UI
+              element.style.boxShadow = prevBoxShadow;
+              element.style.margin = prevMargin;
+              if (devScroll) {
+                  devScroll.style.maxHeight = prevMaxHeight;
+                  devScroll.style.overflowY = prevOverflowY;
+              }
+          });
+      }, 100);
+    }
+  </script>
+</body>
+</html>

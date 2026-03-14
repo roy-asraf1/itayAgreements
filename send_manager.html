@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>איתי ראובני – מנהל שליחת חתימות</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:   #0f2647;
+      --blue:   #1a3a6b;
+      --gold:   #c8a84b;
+      --goldlt: #f0d86e;
+      --bg:     #0d1c35;
+      --white:  #ffffff;
+      --offwh:  #f7f8fc;
+      --text:   #1e2b3c;
+      --muted:  #6b7a8d;
+      --border: #dde2ea;
+      --radius: 16px;
+      --shadow: 0 8px 40px rgba(0,0,0,.22);
+    }
+    body {
+      font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+      background: linear-gradient(160deg, var(--bg) 0%, var(--blue) 100%);
+      min-height: 100vh;
+      color: var(--text);
+      direction: rtl;
+    }
+    /* Auth */
+    #loginOverlay { position:fixed; inset:0; z-index:9999; background: var(--bg); display:flex; align-items:center; justify-content:center; }
+    #loginOverlay.hidden { display:none; }
+    .login-box { background:var(--white); border-radius:var(--radius); padding:40px; text-align:center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .login-box input { display:block; margin:15px auto; padding:10px; width:100%; text-align:center; }
+    .login-box button { width:100%; padding:10px; background:var(--blue); color:white; border:none; border-radius:8px; cursor:pointer; }
+    
+    /* Header */
+    .site-header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(15,38,71,.95);
+      border-bottom: 1px solid rgba(200,168,75,.25);
+    }
+    .logo { color:white; text-decoration:none; display:flex; align-items:center; gap:10px; font-weight:bold; }
+
+    /* Main */
+    .main-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .card { background: var(--white); border-radius: var(--radius); padding: 40px; box-shadow: var(--shadow); }
+    
+    h2 { color: var(--blue); margin-bottom: 10px; text-align: center; }
+    p.desc { text-align: center; color: var(--muted); margin-bottom: 30px; }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--offwh);
+      margin-bottom: 25px;
+      transition: 0.3s;
+    }
+    .drop-zone:hover { border-color: var(--blue); background: #eef2f7; }
+    
+    .form-section { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; }
+    .form-section h3 { margin-top: 0; font-size: 1rem; color: var(--blue); border-bottom: 2px solid var(--goldlt); display: inline-block; padding-bottom: 3px; margin-bottom: 15px; }
+    
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    
+    .btn-send {
+      width: 100%; padding: 15px; 
+      background: linear-gradient(135deg, var(--blue), #2a5298);
+      color: white; border: none; border-radius: 12px;
+      font-size: 1.1rem; font-weight: bold; cursor: pointer;
+      margin-top: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .btn-send:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .btn-send:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+    .status-msg { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; display: none; }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* Hide/Show logic */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">✍️ מנהל חתימות</a>
+    <a href="index.html" style="color:var(--gold); text-decoration:none;">חזרה לתפריט</a>
+  </header>
+
+  <div class="main-container">
+    <div class="card">
+      <h2 id="pageTitle">שליחת מסמך לחתימה</h2>
+      <p class="desc" id="pageDesc">העלה קובץ PDF ובחר את הנמענים</p>
+
+      <!-- File Upload -->
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size:30px;">📄</div>
+        <div id="fileName" style="font-weight:bold; margin-top:10px;">לחץ לבחירת קובץ PDF</div>
+        <input type="file" id="fileInput" accept="application/pdf" style="display:none" onchange="handleFile(this.files[0])">
+      </div>
+
+      <!-- Recipients Form -->
+      <div id="ownerSection" class="form-section hidden">
+        <h3>פרטי בעל הנכס (נמען 1)</h3>
+        <div class="input-row">
+            <input type="text" id="ownerName" placeholder="שם מלא">
+            <input type="email" id="ownerEmail" placeholder="דואר אלקטרוני">
+        </div>
+      </div>
+
+      <div id="clientSection" class="form-section hidden">
+        <h3 id="clientTitle">פרטי הלקוח</h3>
+        <div class="input-row">
+            <input type="text" id="clientName" placeholder="שם מלא">
+            <input type="email" id="clientEmail" placeholder="דואר אלקטרוני">
+        </div>
+      </div>
+
+      <button class="btn-send" id="sendBtn" onclick="sendDocument()">שלח לחתימה</button>
+      
+      <div id="statusMsg" class="status-msg"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Mode Logic ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') || 'client'; // default
+    
+    const ownerSec = document.getElementById('ownerSection');
+    const clientSec = document.getElementById('clientSection');
+    const titleEl = document.getElementById('pageTitle');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Configure UI based on mode
+    if(mode === 'owner') {
+        titleEl.textContent = 'שליחה לחתימת בעל נכס';
+        ownerSec.classList.remove('hidden');
+    } else if (mode === 'client') {
+        titleEl.textContent = 'שליחה לחתימת לקוח';
+        clientSec.classList.remove('hidden');
+    } else if (mode === 'both') {
+        titleEl.textContent = 'שליחה לבעל נכס ואח"כ ללקוח';
+        ownerSec.classList.remove('hidden');
+        clientSec.classList.remove('hidden');
+        // Add visual cue for order
+        ownerSec.querySelector('h3').textContent = '1. פרטי בעל הנכס (חותם ראשון)';
+        clientSec.querySelector('h3').textContent = '2. פרטי הלקוח (חותם שני)';
+    }
+
+    // --- File Logic ---
+    let selectedFile = null;
+    function handleFile(file) {
+        if(!file) return;
+        if(file.type !== 'application/pdf') { alert('רק קבצי PDF'); return; }
+        selectedFile = file;
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('dropZone').style.borderColor = '#27ae60';
+        document.getElementById('dropZone').style.background = '#eafaf1';
+    }
+
+    // --- Send Logic ---
+    async function sendDocument() {
+        if(!selectedFile) { alert('נא לבחור קובץ'); return; }
+        
+        const recipients = [];
+
+        // Collect Owners Data
+        if(mode === 'owner' || mode === 'both') {
+            const name = document.getElementById('ownerName').value;
+            const email = document.getElementById('ownerEmail').value;
+            if(!name || !email) { alert('נא למלא פרטי בעל נכס'); return; }
+            recipients.push({ name, email, role: 'owner' });
+        }
+
+        // Collect Client Data
+        if(mode === 'client' || mode === 'both') {
+            const name = document.getElementById('clientName').value;
+            const email = document.getElementById('clientEmail').value;
+            if(!name || !email) { alert('נא למלא פרטי לקוח'); return; }
+            recipients.push({ name, email, role: 'client' });
+        }
+
+        const btnOriginalText = sendBtn.textContent;
+        sendBtn.textContent = 'שולח...';
+        sendBtn.disabled = true;
+
+        try {
+            const base64File = await toBase64(selectedFile);
+            
+            // API CONFIG - REPLACE KEY HERE
+            const API_KEY = 'n1XsL3sqwRSCQxEM2QGYe3Hc1ybwDLgezqB6A21c4Hj'; 
+            
+            // DocuSeal Submission Payload
+            // If multiple recipients are provided, DocuSeal usually sends to all (parallel) unless Template is used with ordering.
+            // For ad-hoc documents (Direct PDF upload), many APIs default to parallel.
+            // To force sequential, some APIs need specific flags or defined roles order.
+            // We'll send as standard list for now.
+            
+            const payload = {
+                documents: [{
+                    name: selectedFile.name,
+                    file: base64File
+                }],
+                recipients: recipients
+            };
+
+            // UNCOMMENT TO ACTIVATE
+            /*
+            const response = await fetch('https://api.docuseal.com/submissions', {
+                method: 'POST',
+                headers: {
+                    'X-Auth-Token': API_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if(!response.ok) {
+                const err = await response.json();
+                throw new Error(JSON.stringify(err));
+            }
+            const data = await response.json();
+            */
+
+            // Simulation
+            await new Promise(r => setTimeout(r, 1500));
+            
+            showStatus('המסמך נשלח בהצלחה! (מצב סימולציה)', 'success');
+            
+        } catch(e) {
+            console.error(e);
+            showStatus('שגיאה בשליחה: ' + e.message, 'error');
+        } finally {
+            sendBtn.textContent = btnOriginalText;
+            sendBtn.disabled = false;
+        }
+    }
+
+    function showStatus(msg, type) {
+        const el = document.getElementById('statusMsg');
+        el.textContent = msg;
+        el.className = 'status-msg ' + type;
+        el.style.display = 'block';
+    }
+
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+        });
+    }
+  </script>
+</body>
+</html>

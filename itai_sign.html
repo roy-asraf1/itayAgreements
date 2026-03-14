@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>איתי ראובני – חתימה אישית</title>
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        // PDF.js worker setup
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    </script>
+
+    <style>
+        :root {
+            --navy:   #0f2647;
+            --blue:   #1a3a6b;
+            --gold:   #c8a84b;
+            --goldlt: #f0d86e;
+            --bg:     #0d1c35;
+            --white:  #ffffff;
+            --offwh:  #f7f8fc;
+            --muted:  #6b7a8d;
+            --border: #dde2ea;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(160deg, var(--bg) 0%, var(--blue) 100%);
+            margin: 0;
+            min-height: 100vh;
+            color: #333;
+            direction: rtl;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15,38,71,0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(200,168,75,0.3);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .logo { font-size: 1.4rem; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .back-btn { color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
+        .back-btn:hover { background: var(--gold); color: var(--navy); }
+
+        /* Auth */
+        #authOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: white; padding: 40px; border-radius: 16px; text-align: center; width: 300px; }
+        .auth-box input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 8px; text-align: center; }
+        .auth-box button { width: 100%; padding: 10px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; }
+
+        /* Main Layout */
+        .workspace {
+            display: flex;
+            height: calc(100vh - 70px);
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Sidebar - Controls */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .control-group h3 { color: var(--blue); margin-top: 0; font-size: 1.1rem; border-bottom: 2px solid var(--gold); padding-bottom: 8px; }
+        
+        .upload-btn {
+            background: var(--offwh);
+            border: 2px dashed var(--blue);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .upload-btn:hover { background: #eef2f9; }
+
+        /* Signature Pad Area */
+        .sig-container { border: 1px solid #ccc; border-radius: 8px; background: #fff; position: relative; }
+        canvas#sigPad { width: 100%; height: 150px; display: block; }
+        .sig-tools { display: flex; justify-content: space-between; padding: 5px 10px; background: #f0f0f0; border-radius: 0 0 8px 8px; font-size: 0.8rem; }
+        .sig-btn { cursor: pointer; color: var(--blue); }
+        
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-blue { background: var(--blue); color: white; }
+        .btn-blue:hover { background: #2a5298; }
+        .btn-green { background: #27ae60; color: white; }
+        .btn-green:hover { background: #219150; }
+
+        /* Preview Area */
+        .preview-area {
+            flex: 1;
+            background: #525659;
+            border-radius: var(--radius);
+            overflow: auto;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        #pdfWrapper {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        #pdfCanvas { display: block; }
+
+        /* Draggable Signature */
+        .drag-sig {
+            position: absolute;
+            top: 0; left: 0;
+            border: 2px dashed var(--blue);
+            background: rgba(255, 255, 0, 0.1);
+            cursor: move;
+            z-index: 100;
+            display: none; /* hidden initially */
+        }
+        .drag-sig img { width: 100%; height: 100%; display: block; pointer-events: none; }
+        .drag-sig.placed { border: 2px solid transparent; background: transparent; }
+        
+        .resize-handle {
+            width: 10px; height: 10px; background: var(--blue);
+            position: absolute; bottom: -5px; right: -5px;
+            cursor: se-resize;
+        }
+
+        /* Page Controls */
+        .page-controls {
+            display: flex; justify-content: center; align-items: center; gap: 15px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html" class="logo">
+            <i class="fas fa-pen-nib"></i>
+            איתי ראובני - חתימת מסמכים
+        </a>
+        <a href="index.html" class="back-btn">חזרה לתפריט</a>
+    </header>
+
+    <!-- Workspace -->
+    <div class="workspace">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="control-group">
+                <h3>1. העלאת קובץ (PDF)</h3>
+                <label class="upload-btn">
+                    <i class="fas fa-cloud-upload-alt" style="font-size:24px; color:var(--blue)"></i>
+                    <div style="margin-top:5px; font-weight:bold;">לחץ לבחירת קובץ</div>
+                    <input type="file" id="fileInput" accept="application/pdf" style="display:none" onchange="loadPDF(this.files[0])">
+                </label>
+            </div>
+
+            <div class="control-group">
+                <h3>2. חתימה</h3>
+                <div class="sig-container">
+                    <canvas id="sigPad"></canvas>
+                    <div class="sig-tools">
+                        <span class="sig-btn" onclick="clearSig()">נקה</span>
+                        <span style="color:#aaa">צייר כאן</span>
+                    </div>
+                </div>
+                <button class="action-btn btn-blue" onclick="createSignatureSticker()" style="margin-top:10px;">
+                    <i class="fas fa-stamp"></i> צור חותמת
+                </button>
+                <p style="font-size:0.8rem; color:var(--muted); margin-top:5px;">
+                    לחץ על "צור חותמת" ואז גרור אותה למיקום הרצוי במסמך.
+                </p>
+            </div>
+
+            <div class="control-group" style="margin-top:auto;">
+                <h3>3. שמירה וייצוא</h3>
+                <button class="action-btn btn-green" onclick="savePDF()">
+                    <i class="fas fa-file-export"></i> הורד PDF חתום
+                </button>
+            </div>
+            
+             <div class="page-controls" id="pageControls" style="display:none">
+                <button onclick="changePage(-1)">❮</button>
+                <span id="pageNum">עמוד 1</span>
+                <button onclick="changePage(1)">❯</button>
+            </div>
+        </aside>
+
+        <!-- Preview -->
+        <main class="preview-area">
+            <div id="pdfWrapper">
+                <canvas id="pdfCanvas"></canvas>
+                <!-- Draggable Signature Element -->
+                <div id="dragSig" class="drag-sig">
+                    <img id="sigImage" src="" />
+                    <div class="resize-handle" onmousedown="startResize(event)"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- PDF Rendering ---
+        let pdfDoc = null;
+        let pageNum = 1;
+        let pdfScale = 1.0; // Render at 100% (72dpi * scale) usually 1.5 for crisp
+        let pdfBytes = null; // Store raw bytes for modification
+        
+        const canvas = document.getElementById('pdfCanvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('pdfWrapper');
+
+        async function loadPDF(file) {
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                // 🟢 תיקון: יצירת עותק של ה-ArrayBuffer
+                // PDF.js מנתק את ה-buffer המקורי, ולכן אנו צריכים לשמור עותק נקי בצד עבור השמירה (savePDF)
+                const originalBuffer = e.target.result;
+                pdfBytes = originalBuffer.slice(0); // שמירת עותק לשימוש מאוחר ב-pdf-lib
+
+                // שליחת עותק נוסף ל-PDF.js כדי שלא יפגע במידע שאנו שומרים
+                const docBuffer = originalBuffer.slice(0); 
+                const typedarray = new Uint8Array(docBuffer);
+
+                pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                document.getElementById('pageControls').style.display = 'flex';
+                renderPage(pageNum);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function renderPage(num) {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({scale: 1.5});
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            wrapper.style.width = viewport.width + 'px';
+            wrapper.style.height = viewport.height + 'px';
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            await page.render(renderContext).promise;
+            document.getElementById('pageNum').textContent = 'עמוד ' + num;
+        }
+
+        function changePage(offset) {
+            if(!pdfDoc) return;
+            if(pageNum + offset >= 1 && pageNum + offset <= pdfDoc.numPages) {
+                pageNum += offset;
+                renderPage(pageNum);
+                // Hide sticker on page change for simplicity (or reset position)
+                 document.getElementById('dragSig').style.display = 'none';
+            }
+        }
+
+        // --- Signature Pad ---
+        const sigCanvas = document.getElementById('sigPad');
+        const signaturePad = new SignaturePad(sigCanvas);
+        
+        function resizeCanvas() {
+            const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            sigCanvas.width = sigCanvas.offsetWidth * ratio;
+            sigCanvas.height = sigCanvas.offsetHeight * ratio;
+            sigCanvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        function clearSig() { signaturePad.clear(); }
+
+        // --- Sticker Logic ---
+        const dragSig = document.getElementById('dragSig');
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        function createSignatureSticker() {
+            if(signaturePad.isEmpty()) { alert('נא לחתום קודם'); return; }
+            const dataUrl = signaturePad.toDataURL();
+            document.getElementById('sigImage').src = dataUrl;
+            
+            // Show sticket centered
+            dragSig.style.display = 'block';
+            dragSig.style.width = '200px';
+            dragSig.style.height = '100px';
+            dragSig.style.top = '100px';
+            dragSig.style.left = '100px';
+        }
+
+        // Dragging
+        dragSig.addEventListener('mousedown', function(e) {
+            if(e.target.classList.contains('resize-handle')) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialLeft = dragSig.offsetLeft;
+            initialTop = dragSig.offsetTop;
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        function onMouseMove(e) {
+            if(!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            dragSig.style.left = (initialLeft + dx) + 'px';
+            dragSig.style.top = (initialTop + dy) + 'px';
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        // Resizing
+        let isResizing = false;
+        function startResize(e) {
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const initialWidth = dragSig.offsetWidth;
+            const initialHeight = dragSig.offsetHeight;
+
+            function doResize(ev) {
+                const w = initialWidth + (ev.clientX - startX);
+                const h = initialHeight + (ev.clientY - startY);
+                dragSig.style.width = w + 'px';
+                dragSig.style.height = h + 'px';
+            }
+
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('mousemove', doResize);
+                document.removeEventListener('mouseup', stopResize);
+            }
+
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('mouseup', stopResize);
+            e.stopPropagation(); // prevent drag
+        }
+
+        // --- Save PDF ---
+        async function savePDF() {
+            if(!pdfBytes) { alert('נא להעלות קובץ PDF'); return; }
+            if(document.getElementById('dragSig').style.display === 'none') {
+                 if(!confirm('לא הוספת חתימה. האם להמשיך?')) return;
+            }
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const pdfDocWrite = await PDFDocument.load(pdfBytes);
+                const pages = pdfDocWrite.getPages();
+                const page = pages[pageNum - 1]; // 0-based index
+
+                // Calculate position considering scale
+                // PDF.js rendered at scale 1.5 (defined in renderPage)
+                // We need to map visual pixels to PDF points
+                
+                if(document.getElementById('dragSig').style.display !== 'none') {
+                    const sigData = signaturePad.toDataURL('image/png');
+                    const signatureImage = await pdfDocWrite.embedPng(sigData);
+                    
+                    const viewportScale = 1.5; // Must match renderPage
+                    
+                    // Visual position relative to the canvas/wrapper
+                    const visualX = dragSig.offsetLeft;
+                    const visualY = dragSig.offsetTop;
+                    const visualW = dragSig.offsetWidth;
+                    const visualH = dragSig.offsetHeight;
+
+                    // PDF viewport height (points)
+                    const { width, height } = page.getSize();
+                    
+                    // Conversion logic:
+                    // PDF coordinates start at bottom-left.
+                    // Canvas (top-left) y = 0 maps to PDF y = height.
+                    
+                    // 1. Convert visual pixels to PDF points
+                    // renderPage used viewport = page.getViewport({scale: 1.5});
+                    // so 1 visual CSS pixel = 1 / 1.5 PDF points ?? 
+                    // Wait, PDF.js viewport.height is in CSS pixels (if unscaled) or canvas pixels?
+                    // We set canvas.height = viewport.height.
+                    
+                    // Correct approach:
+                    // x_pdf = visual_x / scale
+                    // y_pdf = height - (visual_y / scale) - (visual_h / scale)
+                    
+                    const x = visualX / viewportScale;
+                    const w = visualW / viewportScale;
+                    const h = visualH / viewportScale;
+                    const y = height - (visualY / viewportScale) - h;
+
+                    page.drawImage(signatureImage, {
+                        x: x,
+                        y: y,
+                        width: w,
+                        height: h,
+                    });
+                }
+
+                const pdfBytesOut = await pdfDocWrite.save();
+                download(pdfBytesOut, "signed_agreement.pdf", "application/pdf");
+
+            } catch(e) {
+                console.error(e);
+                alert('שגיאה בשמירת הקובץ: ' + e.message);
+            }
+        }
+
+        function download(data, filename, type) {
+            const blob = new Blob([data], {type: type});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

@@ -287,8 +287,8 @@ try {
 
       <div class="sec-title">פרטי הנכס והתמחור (עמוד אחרון)</div>
       <div class="frow">
-        <label>כתובת הנכס לצילום</label>
-        <input id="a3paddr" type="text" placeholder="כתובת הלוקיישן..." oninput="renderDoc()" />
+        <label>ישוב/עיר/מושב וכו</label>
+        <input id="a3paddr" type="text" placeholder="ישוב..." oninput="renderDoc()" />
       </div>
       <div class="frow">
         <label>השימוש שיערך בנכס</label>
@@ -447,9 +447,9 @@ function renderDoc() {
 <div style="text-align:center; margin-bottom: 20px;">
   מזמין <strong>${fv(cname, '____________________')}</strong><br>
   ת.ז <strong>${fv(cid, '____________________')}</strong><br>
-  :בכתובת <strong>${fv(caddr, '____________________')}</strong><br>
+  מרחוב: <strong>${fv(caddr, '____________________')}</strong><br>
   (להלן: "הלקוח")
-  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">;מצד אחד</div>
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">מצד אחד</div>
 </div>
 
 <div style="text-align:center; font-weight:bold; margin-bottom:20px;">ל ב י ן</div>
@@ -459,7 +459,7 @@ function renderDoc() {
   ע.מ. 208777367<br>
   מרחוב שניר 112, כפר ורדים<br>
   (להלן: "ספק השירותים")
-  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">;מצד שני</div>
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:5px;">מצד שני</div>
 </div>
 
 <div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו שירותי איתור לוקיישנים ואובייקטים שונים לימי צילום, בהתאם לבקשת הלקוח, הכולל ליווי שוטף של הלקוח לרבות לימי הביקור וכן התקשרות בהסכם עם בעל הלוקיישן ו/או האובייקט כשלוח וכנציג מטעם הלקוח ("השירותים");</div>
@@ -533,7 +533,7 @@ function renderDoc() {
 <div style="font-weight:700; text-decoration:underline; margin-bottom:15px;">נוסח הזמנה</div>
 
 <div class="clause" style="line-height:2.2;">
-הלקוח מזמין בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא בכתובת ${fv(paddr, '____________________')} לרבות כל תכולתו, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
+הלקוח מזמין בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא ב ${fv(paddr, '____________________')} לרבות כל תכולתו, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
 </div>
 
 <div class="clause">השימוש אשר יערך בנכס הינו כדלהלן: <span class="fv">${use || '____________________'}</span>.</div>

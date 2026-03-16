@@ -23,6 +23,9 @@
       .form-panel { position: static; top: auto; max-height: none; }
       .doc-scroll { overflow-x: visible; max-height: none; display: block; padding: 10px; }
       #doc-container { width: 100% !important; min-height: unset; padding: 4mm 5mm; }
+      .preview-panel { display: none; }
+      .preview-panel.visible { display: block; }
+      .btn-preview-toggle { display: flex; }
     }
     @media (max-width: 600px) {
       .site-header { padding: 10px 16px; }
@@ -43,6 +46,8 @@
     #a1purpcustom { margin-top:8px; display:none; }
     .btn-gen { width:100%; margin-top:16px; padding:13px; background: linear-gradient(135deg, var(--blue), #2a5298); color:#fff; border:none; border-radius:12px; font-size:.97rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px; box-shadow: 0 5px 18px rgba(26,58,107,.32); }
     .btn-gen:hover { transform:translateY(-2px); }
+    .btn-preview-toggle { display:none; width:100%; margin-top:10px; padding:11px; background:transparent; border:1.5px solid var(--blue); color:var(--blue); border-radius:12px; font-size:.93rem; font-weight:700; cursor:pointer; align-items:center; justify-content:center; gap:8px; transition:.2s; }
+    .btn-preview-toggle:hover { background:var(--blue); color:#fff; }
     .preview-panel { background: var(--white); border-radius: var(--radius); padding: 26px 28px; box-shadow: var(--shadow); }
     .preview-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid #eef0f5; }
     .preview-top h3 { color: var(--blue); font-size:1rem; }
@@ -171,6 +176,7 @@
         </div>
 
         <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
+        <button class="btn-preview-toggle" id="togglePreviewBtn" onclick="togglePreview()">👁 הצג תצוגה מקדימה</button>
       </div>
 
       <!-- PREVIEW -->
@@ -335,6 +341,18 @@
 
     function downloadPDF() {
       window.print();
+    }
+
+    function togglePreview() {
+      const panel = document.querySelector('.preview-panel');
+      const btn = document.getElementById('togglePreviewBtn');
+      if (panel.classList.toggle('visible')) {
+        btn.textContent = '🙈 הסתר תצוגה מקדימה';
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        btn.textContent = '👁 הצג תצוגה מקדימה';
+        document.querySelector('.form-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   </script>
 </body>

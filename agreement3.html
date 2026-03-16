@@ -175,7 +175,7 @@
     .sig-line { margin-top: 20px; border-top: 1px solid #000; width: 60%; margin-left: auto; margin-right: auto; padding-top: 5px; }
 
     /* ─── PRINT / PDF ─── */
-    @page { margin: 15mm; size: A4; }
+    @page { margin: 0; size: A4; }
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { background: white !important; margin: 0; padding: 0; }
@@ -187,6 +187,9 @@
       #doc3 { padding: 15mm 18mm !important; font-size: 13px !important; line-height: 1.5 !important; }
       .page-break { page-break-before: always !important; border: none !important; color: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; }
       .btn-gen, .btn-pdf { display: none !important; }
+      body::before, body::after { content: ''; display: block; position: fixed; left: 0; right: 0; height: 20mm; background: white; z-index: 9999; }
+      body::before { top: 0; }
+      body::after { bottom: 0; }
     }
 
     /* ─── FLATPICKR OVERRIDES ─── */

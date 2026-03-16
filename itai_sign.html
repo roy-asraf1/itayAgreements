@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>איתי ראובני – חתימה אישית</title>
+    <title>Lock and Action – חתימה דיגיטלית</title>
+    <link rel="icon" href="l.jpg" type="image/jpeg">
     <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -49,7 +50,11 @@
             color: white;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-        .logo { font-size: 1.4rem; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo { font-size: 1rem; font-weight: bold; color: var(--gold); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .logo-text { display: flex; flex-direction: column; }
+        .logo-text .logo-title { color: white; font-size: 1rem; font-weight: 700; }
+        .logo-text .logo-sub   { color: var(--gold); font-size: 0.72rem; }
         .back-btn { color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
         .back-btn:hover { background: var(--gold); color: var(--navy); }
 
@@ -173,8 +178,11 @@
     <!-- Header -->
     <header class="header">
         <a href="index.html" class="logo">
-            <i class="fas fa-pen-nib"></i>
-            איתי ראובני - חתימת מסמכים
+            <img src="l.jpg" alt="LA">
+            <div class="logo-text">
+                <span class="logo-title">Lock and Action</span>
+                <span class="logo-sub">חתימת מסמכים</span>
+            </div>
         </a>
         <a href="index.html" class="back-btn">חזרה לתפריט</a>
     </header>

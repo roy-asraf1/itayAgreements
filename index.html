@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>איתי ראובני – יצירת הסכמים</title>
+  <title>Lock and Action – יצירת הסכמים</title>
+  <link rel="icon" href="l.jpg" type="image/jpeg">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --navy: #0f2647; --blue: #1a3a6b; --gold: #c8a84b; --goldlt: #f0d86e; --bg: #0d1c35; --white: #ffffff; --muted: #6b7a8d; --border: #dde2ea; --radius: 16px; --shadow: 0 8px 40px rgba(0,0,0,.22); }
     body { font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif; background: linear-gradient(160deg, var(--bg) 0%, var(--blue) 100%); min-height: 100vh; color: #1e2b3c; direction: rtl; }
     .site-header { position: sticky; top: 0; display: flex; align-items: center; padding: 14px 32px; background: rgba(15,38,71,.88); border-bottom: 1px solid rgba(200,168,75,.25); z-index: 100; }
     .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo-icon { width: 46px; height: 46px; background: linear-gradient(135deg, var(--gold), var(--goldlt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .logo-icon { width: 46px; height: 46px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+    .logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .logo-title { color: var(--white); font-size: 18px; font-weight: 700; }
     .logo-sub { color: var(--gold); font-size: 12px; }
     .home-hero { text-align: center; padding: 50px 16px 36px; }
@@ -36,9 +38,9 @@
 <body>
   <div id="loginOverlay">
     <div class="login-box">
-      <div class="logo-icon" style="margin:0 auto">🔒</div>
-      <h2>איתי ראובני</h2>
-      <p style="color:#6b7a8d;font-size:0.9rem;margin-top:5px;">הכנס קוד גישה למערכת</p>
+      <img src="lock.jpg" alt="Lock and Action" style="width:220px;display:block;margin:0 auto 20px;">
+      <p style="color:#6b7a8d;font-size:0.9rem;">מערכת ניהול הסכמים</p>
+      <p style="color:#6b7a8d;font-size:0.82rem;margin-top:4px;">הכנס קוד גישה למערכת</p>
       <input id="loginCode" type="password" placeholder="קוד גישה" maxlength="20" onkeydown="if(event.key==='Enter')checkLogin()" />
       <button onclick="checkLogin()">כניסה</button>
       <div class="login-err" id="loginErr"></div>
@@ -56,14 +58,14 @@
 
   <header class="site-header">
     <a href="index.html" class="logo">
-      <div class="logo-icon">📋</div>
-      <div><div class="logo-title">איתי ראובני</div><div class="logo-sub">יצירת הסכמים</div></div>
+      <div class="logo-icon"><img src="l.jpg" alt="LA"></div>
+      <div><div class="logo-title">Lock and Action</div><div class="logo-sub">A New Standard in Productions</div></div>
     </a>
   </header>
 
   <div class="home-hero">
-    <h2>יצירת הסכמים מקצועיים</h2>
-    <p>תפריט ראשי - בחר את ההסכם הרצוי מהרשימה</p>
+    <h2>Lock and Action</h2>
+    <p>מערכת ניהול הסכמים מקצועית – בחר את ההסכם הרצוי</p>
   </div>
 
   <div class="cards-grid">

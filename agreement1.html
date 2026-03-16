@@ -21,7 +21,8 @@
     @media (max-width: 880px) {
       .editor-wrap { grid-template-columns: 1fr; }
       .form-panel { position: static; top: auto; max-height: none; }
-      .doc-scroll { overflow-x: auto; max-height: 70vh; }
+      .doc-scroll { overflow-x: visible; max-height: none; display: block; padding: 10px; }
+      #doc-container { width: 100% !important; min-height: unset; padding: 4mm 5mm; }
     }
     @media (max-width: 600px) {
       .site-header { padding: 10px 16px; }

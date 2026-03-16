@@ -332,8 +332,7 @@ try {
         <label>דרישות נוספות בנכס (מלבד ניקיון)</label>
         <input id="a3reqs" type="text" placeholder="למשל: תאורה רכה..." oninput="renderDoc()" />
       </div>
-
-      <div class="sec-title">תמורה ושעות</div>
+<div class="sec-title">תמורה ושעות</div>
       <div class="row2">
         <div class="frow">
           <label>סה"כ שעות בסיס (W)</label>
@@ -353,9 +352,14 @@ try {
         <input id="a3extraBase" type="number" placeholder="למשל: 900" value="900" oninput="renderDoc()" />
       </div>
 
+      <div class="sec-title">הגדרות הדפסה</div>
+      <div class="frow" style="display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; border: 1px solid #eee;">
+        <input id="showMarketing" type="checkbox" checked onchange="renderDoc()" style="width: 20px; height: 20px; cursor: pointer;" />
+        <label for="showMarketing" style="margin: 0; cursor: pointer; font-weight: bold; color: var(--blue);">הצג סעיף "שימוש בתכנים" (שיווק)</label>
+      </div>
+
       <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
     </div>
-
     <!-- PREVIEW -->
     <div class="preview-panel">
       <div class="preview-top">
@@ -432,6 +436,7 @@ function renderDoc() {
   const extraBase = parseFloat(v('a3extraBase')) || 900;
   
   // Calculations
+  const showMarketing = document.getElementById('showMarketing').checked;
   const crewMaxTotal = (crewNum && crewMax) ? (parseInt(crewNum) + parseInt(crewMax)) : 'Y+4';
   const priceWithVat = price ? addCommas(parseFloat(price) * (1 + vatRate/100)) : '_______';
   const extra150     = addCommas(extraBase * 1.5);
@@ -440,7 +445,7 @@ function renderDoc() {
 
   g('doc3').innerHTML = `
 <div class="doc-title">הסכם מתן שירותים</div>
-<div style="margin-bottom: 20px; font-weight: 700;">שנערך ונחתם ביום ${fv(dateFormatted, '_______________')}</div>
+<div style="margin-bottom: 20px; font-weight: 700; text-align: center;">שנערך ונחתם ביום ${fv(dateFormatted, '_______________')}</div>
 
 <div style="text-align:center; font-weight:bold; margin-bottom:20px;">ב י ן</div>
 
@@ -547,7 +552,7 @@ function renderDoc() {
 
 <div class="clause" style="line-height:2.2; margin-top: 10px;">
 התמורה בגין השימוש בנכס תהיה כדלהלן: בגין ${fv(hours, 'W')} שעות יחויב הלקוח בסכום של <span dir="ltr">${formattedPrice}</span> ₪ + מע"מ (בסה"כ ${fv(priceWithVat, '_______')} ₪). 
-בגין שעה נוספת יחויב הלקוח בסכום של ${fv(formattedExtraBase, '900')} ₪ ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% כלומר ${fv(formattedExtraBase, '900')} X 150% = <span dir="ltr">${fv(extra150, '1,200')}</span> ₪ + מע"מ.
+בגין שעה נוספת יחויב הלקוח בסכום של ${fv(formattedExtraBase, '900')} ₪ ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% כלומר ${fv(formattedExtraBase, '900')} X 1.5 = <span dir="ltr">${fv(extra150, '1,350')}</span> ₪ + מע"מ.
 </div>
 
 <div class="clause" style="margin-top: 10px; font-size: 0.95em;">
@@ -572,11 +577,13 @@ function renderDoc() {
 הלקוח מתחייב להחזיר את הנכס לבעל הנכס כאשר הינו נקי ובמצב בו קיבלו. ככל ונגרם נזק לנכס או לתכולתו, יודיע הלקוח מיידית לספק השירותים על הנזק, וכל עלות שתידרש בגין התיקון תהיה באחריותו.
 </div>
 
+${showMarketing ? `
 <div class="clause" style="margin-top: 15px;"><strong>שימוש בתכנים</strong></div>
 <div style="margin-right: 15px; margin-bottom: 5px;">
 <div style="margin-bottom: 5px;">• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לצלם תכנים "מאחורי הקלעים" המציגים את יום הצילום והשימוש בנכס, ולהשתמש בתכנים אלה לצורכי שיווק ופרסום, לרבות פרסום ממומן או לא ממומן, בכל פלטפורמה.</div>
 <div>• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לעשות שימוש גם בתכנים שיצרו הלקוח, המשתתפות והדף העסקי של הלקוח, לרבות פרסום ממומן, בכפוף לקרדיט מתאים ליוצרי התוכן.</div>
 </div>
+` : ''}
 
 <div style="margin-top: 20px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
 

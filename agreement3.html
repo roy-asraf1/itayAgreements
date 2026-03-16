@@ -38,10 +38,11 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 32px;
       background: rgba(15,38,71,.88);
+      -webkit-backdrop-filter: blur(14px);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(200,168,75,.25);
     }
-
+    
     .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
     .logo-icon {
       width: 46px; height: 46px;
@@ -75,6 +76,12 @@
     }
     @media (max-width: 880px) {
       .editor-wrap { grid-template-columns: 1fr; }
+      .form-panel { position: static; top: auto; max-height: none; }
+      .doc-scroll { overflow-x: auto; max-height: 70vh; }
+    }
+    @media (max-width: 600px) {
+      .site-header { padding: 10px 16px; }
+      .logo-sub { display: none; }
     }
 
     /* ─── FORM PANEL ─── */
@@ -340,7 +347,7 @@ try {
         </div>
         <div class="frow">
           <label>אחוז מע"מ (%)</label>
-          <input id="a3vat" type="number" value="18" oninput="renderDoc()" />
+          <input id="a3vat" type="number" value="18" placeholder="למשל: 18" oninput="renderDoc()" />
         </div>
       </div>
       <div class="frow">
@@ -355,7 +362,7 @@ try {
       <div class="sec-title">הגדרות הדפסה</div>
       <div class="frow" style="display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; border: 1px solid #eee;">
         <input id="showMarketing" type="checkbox" checked onchange="renderDoc()" style="width: 20px; height: 20px; cursor: pointer;" />
-        <label for="showMarketing" style="margin: 0; cursor: pointer; font-weight: bold; color: var(--blue);">הצג סעיף "שימוש בתכנים" (שיווק)</label>
+        <label for="showMarketing" style="margin: 0; cursor: pointer; font-weight: bold; color: var(--blue);">הצג סעיף</label>
       </div>
 
       <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
@@ -552,7 +559,7 @@ function renderDoc() {
 
 <div class="clause" style="line-height:2.2; margin-top: 10px;">
 התמורה בגין השימוש בנכס תהיה כדלהלן: בגין ${fv(hours, 'W')} שעות יחויב הלקוח בסכום של <span dir="ltr">${formattedPrice}</span> ₪ + מע"מ (בסה"כ ${fv(priceWithVat, '_______')} ₪). 
-בגין שעה נוספת יחויב הלקוח בסכום של ${fv(formattedExtraBase, '900')} ₪ ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% כלומר ${fv(formattedExtraBase, '900')} X 1.5 = <span dir="ltr">${fv(extra150, '1,350')}</span> ₪ + מע"מ.
+בגין שעה נוספת יחויב הלקוח בסכום של ${fv(formattedExtraBase, '900')} ₪${showMarketing ? ` ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% כלומר ${fv(formattedExtraBase, '900')} X 1.5 = <span dir="ltr">${fv(extra150, '1,350')}</span> ₪ + מע"מ` : ''}.
 </div>
 
 <div class="clause" style="margin-top: 10px; font-size: 0.95em;">
@@ -577,13 +584,11 @@ function renderDoc() {
 הלקוח מתחייב להחזיר את הנכס לבעל הנכס כאשר הינו נקי ובמצב בו קיבלו. ככל ונגרם נזק לנכס או לתכולתו, יודיע הלקוח מיידית לספק השירותים על הנזק, וכל עלות שתידרש בגין התיקון תהיה באחריותו.
 </div>
 
-${showMarketing ? `
 <div class="clause" style="margin-top: 15px;"><strong>שימוש בתכנים</strong></div>
 <div style="margin-right: 15px; margin-bottom: 5px;">
 <div style="margin-bottom: 5px;">• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לצלם תכנים "מאחורי הקלעים" המציגים את יום הצילום והשימוש בנכס, ולהשתמש בתכנים אלה לצורכי שיווק ופרסום, לרבות פרסום ממומן או לא ממומן, בכל פלטפורמה.</div>
 <div>• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לעשות שימוש גם בתכנים שיצרו הלקוח, המשתתפות והדף העסקי של הלקוח, לרבות פרסום ממומן, בכפוף לקרדיט מתאים ליוצרי התוכן.</div>
 </div>
-` : ''}
 
 <div style="margin-top: 20px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
 

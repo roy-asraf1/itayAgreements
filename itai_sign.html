@@ -158,6 +158,13 @@
             display: flex; justify-content: center; align-items: center; gap: 15px;
             margin-top: 10px;
         }
+
+        /* ─── MOBILE ─── */
+        @media (max-width: 768px) {
+          .workspace { flex-direction: column; height: auto; overflow-y: visible; }
+          .sidebar { width: 100%; flex-shrink: 0; }
+          .pdf-viewer { min-height: 60vh; }
+        }
     </style>
 </head>
 <body>

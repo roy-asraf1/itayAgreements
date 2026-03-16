@@ -194,6 +194,9 @@
       .page-break { page-break-before: always !important; border: none !important; color: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; }
       .sec-7-break { page-break-before: always !important; }
       .btn-gen, .btn-pdf, .btn-preview-toggle { display: none !important; }
+      body::before, body::after { content: ''; display: block; position: fixed; left: 0; right: 0; height: 20mm; background: white; z-index: 9999; }
+      body::before { top: 0; }
+      body::after { bottom: 0; }
     }
 
     /* ─── FLATPICKR OVERRIDES ─── */

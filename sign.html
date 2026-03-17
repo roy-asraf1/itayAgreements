@@ -726,6 +726,7 @@ async function sendAgreement() {
     const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
 
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:        'roy2796@gmail.com, itay@lockandaction.co.il',
       signer_name:     signerName,
       agreement_type:  agreementNames[agreementType] || 'הסכם',
       sign_date:       signDate,

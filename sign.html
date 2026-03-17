@@ -813,12 +813,34 @@ async function sendAgreement() {
       : (agreementData.oname || agreementData.cname || 'לא צוין');
     const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-    // Send signed HTML via API
+    // Generate PDF from clean div (same HTML as print button — no transform issues)
+    const pdfDiv = document.createElement('div');
+    pdfDiv.style.cssText = 'position:fixed;top:0;left:0;width:794px;background:#fff;font-family:Arial,sans-serif;direction:rtl;color:#1e2b3c;padding:30px;z-index:-1;';
+    pdfDiv.innerHTML = signedContentHtml;
+    document.body.appendChild(pdfDiv);
+
+    const pdfBlob = await html2pdf().set({
+      margin: [10, 10],
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0, windowWidth: 794 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    }).from(pdfDiv).outputPdf('blob');
+    document.body.removeChild(pdfDiv);
+
+    const pdfBase64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.readAsDataURL(pdfBlob);
+    });
+
+    // Send to API
     const resp = await fetch('/api/send-pdf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contentHtml,
+        pdfBase64,
         signerName,
         agreementType: agreementNames[agreementType] || 'הסכם',
         signDate
@@ -845,28 +867,36 @@ let signedContentHtml = '';
 
 function printSignedDoc() {
   if (!signedContentHtml) return;
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>הסכם חתום – Lock and Action</title>
+  const existing = document.getElementById('_printFrame');
+  if (existing) existing.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.id = '_printFrame';
+  iframe.style.cssText = 'position:fixed;top:-10000px;left:-10000px;width:794px;height:1123px;border:none;';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html lang="he" dir="rtl">
+<head><meta charset="UTF-8"><title>הסכם חתום – Lock and Action</title>
 <style>
-  body { font-family: Arial, 'Arial Hebrew', sans-serif; direction: rtl; color: #1e2b3c; padding: 30px; max-width: 794px; margin: 0 auto; }
-  .doc-title { font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 20px; text-decoration: underline; }
-  .clause { margin-bottom: 10px; line-height: 1.7; }
-  .sig-line { border-top: 1.5px solid #333; padding-top: 6px; text-align: center; font-size: 0.9rem; }
+  body { font-family: Arial, 'Arial Hebrew', sans-serif; direction: rtl; color: #1e2b3c; padding: 30px; max-width: 794px; margin: 0 auto; font-size: 10pt; }
+  .doc-title { font-size: 16pt; font-weight: bold; text-align: center; margin-bottom: 20px; text-decoration: underline; }
+  .clause { margin-bottom: 10px; line-height: 1.75; }
+  .sig-line { border-top: 1.5px solid #333; padding-top: 6px; text-align: center; font-size: 0.85rem; min-width: 160px; }
   .sig-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  .sig-table td { width: 50%; padding: 10px; text-align: center; }
+  .sig-table td { width: 50%; padding: 10px; text-align: center; vertical-align: bottom; }
   .page-break { page-break-after: always; border-top: 1px dashed #ccc; margin: 30px 0; text-align: center; font-size: 0.8rem; color: #888; }
-  @media print { body { padding: 0; } }
+  @media print { .page-break { border: none; margin: 0; } body { padding: 10mm; } }
 </style>
 </head>
-<body>${signedContentHtml}</body>
-</html>`);
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 600);
+<body>${signedContentHtml}</body></html>`);
+  doc.close();
+  setTimeout(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => iframe.remove(), 2000);
+  }, 500);
 }
 
 /* ── Start ── */

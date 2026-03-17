@@ -813,39 +813,12 @@ async function sendAgreement() {
       : (agreementData.oname || agreementData.cname || 'לא צוין');
     const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-    // Generate PDF directly from the rendered doc-container (already on screen)
-    const docEl  = document.getElementById('doc-container');
-    const outerEl = document.getElementById('docScaleOuter');
-    const savedTransform = docEl.style.transform;
-    const savedTransformOrigin = docEl.style.transformOrigin;
-    const savedOuterHeight = outerEl.style.height;
-    docEl.style.transform = 'none';
-    docEl.style.transformOrigin = 'top right';
-    outerEl.style.height = 'auto';
-
-    const pdfBlob = await html2pdf().set({
-      margin: [10, 10],
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(docEl).outputPdf('blob');
-
-    docEl.style.transform = savedTransform;
-    docEl.style.transformOrigin = savedTransformOrigin;
-    outerEl.style.height = savedOuterHeight;
-
-    const pdfBase64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.readAsDataURL(pdfBlob);
-    });
-
-    // Send PDF via API
+    // Send signed HTML via API
     const resp = await fetch('/api/send-pdf', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pdfBase64,
+        contentHtml,
         signerName,
         agreementType: agreementNames[agreementType] || 'הסכם',
         signDate

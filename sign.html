@@ -818,13 +818,13 @@ async function sendAgreement() {
     const pdfEl = document.createElement('div');
     pdfEl.id = 'doc-container'; // inherits all #doc-container CSS (width, padding, fonts)
     pdfEl.innerHTML = signedContentHtml;
-    pdfEl.style.cssText = 'position:absolute;top:0;left:0;z-index:999999;background:#fff;';
+    pdfEl.style.cssText = 'position:absolute;top:0;left:0;z-index:999999;background:#fff;padding:20mm 20mm;';
     document.body.insertBefore(pdfEl, document.body.firstChild);
     window.scrollTo(0, 0);
     await new Promise(r => requestAnimationFrame(r));
 
     const pdfBlob = await html2pdf().set({
-      margin: [10, 10],
+      margin: [0, 0],
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0, windowWidth: 794 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },

@@ -813,15 +813,15 @@ async function sendAgreement() {
       : (agreementData.oname || agreementData.cname || 'לא צוין');
     const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-    // Generate PDF directly from doc-container (reset transform so html2canvas doesn't capture blank)
-    const docEl = document.getElementById('doc-container');
-    const scaleOuter = document.getElementById('docScaleOuter');
-    const savedTransform = docEl.style.transform;
-    const savedTOrigin   = docEl.style.transformOrigin;
-    const savedOuterH    = scaleOuter.style.height;
-    docEl.style.transform      = '';
-    docEl.style.transformOrigin = '';
-    scaleOuter.style.height    = 'auto';
+    // Create isolated element at page top — outside doc-outer (no overflow:hidden clipping)
+    // and at top:0 (no blank space from page offset)
+    const pdfEl = document.createElement('div');
+    pdfEl.id = 'doc-container'; // inherits all #doc-container CSS (width, padding, fonts)
+    pdfEl.innerHTML = signedContentHtml;
+    pdfEl.style.cssText = 'position:absolute;top:0;left:0;z-index:999999;background:#fff;';
+    document.body.insertBefore(pdfEl, document.body.firstChild);
+    window.scrollTo(0, 0);
+    await new Promise(r => requestAnimationFrame(r));
 
     const pdfBlob = await html2pdf().set({
       margin: [10, 10],
@@ -829,11 +829,9 @@ async function sendAgreement() {
       html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0, windowWidth: 794 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] }
-    }).from(docEl).outputPdf('blob');
+    }).from(pdfEl).outputPdf('blob');
 
-    docEl.style.transform       = savedTransform;
-    docEl.style.transformOrigin = savedTOrigin;
-    scaleOuter.style.height     = savedOuterH;
+    document.body.removeChild(pdfEl);
 
     const pdfBase64 = await new Promise((resolve) => {
       const reader = new FileReader();

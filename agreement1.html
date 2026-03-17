@@ -398,8 +398,8 @@
         crew:    rawVal('a1crew'),
         purp:    getPurp1()
       };
-      const ownerUrl  = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'owner', data: baseData }))));
-      const clientUrl = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'client', data: baseData }))));
+      const ownerUrl  = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'owner',  data: baseData })))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+      const clientUrl = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'client', data: baseData })))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
       document.getElementById('ownerLinkInput').value  = ownerUrl;
       document.getElementById('clientLinkInput').value = clientUrl;
       document.getElementById('shareModal').style.display = 'flex';

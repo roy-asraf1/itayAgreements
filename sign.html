@@ -216,8 +216,12 @@ let agreementRole = null; // 'owner' | 'client' | null (for agreement1)
 
 function init() {
   try {
-    const hash = location.hash.slice(1);
+    let hash = location.hash.slice(1);
     if (!hash) throw new Error('no hash');
+    // Normalize base64: handle percent-encoded chars + URL-safe base64
+    hash = hash.replace(/%2B/gi, '+').replace(/%2F/gi, '/').replace(/%3D/gi, '=');
+    hash = hash.replace(/-/g, '+').replace(/_/g, '/');
+    hash = hash.replace(/=/g, '') + '='.repeat((4 - hash.replace(/=/g,'').length % 4) % 4);
     const json = decodeURIComponent(escape(atob(hash)));
     const parsed = JSON.parse(json);
     agreementType = parseInt(parsed.type, 10);

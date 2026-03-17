@@ -285,9 +285,9 @@ function renderAgreement1(d) {
   const oidtype = d.oidtype || 'ת.ז.';
   const purp = d.purp || '';
   document.getElementById('doc-container').innerHTML = `
-<div style="margin-bottom:22px; line-height:1.6; text-align:right;">
-  <div style="font-weight:bold; font-size:13pt; margin-bottom:4px;">לכבוד:</div>
-  <div style="font-size:11pt; position:relative;">
+<div style="margin-bottom:10px; line-height:1.5; text-align:right;">
+  <div style="font-weight:bold; font-size:11.5pt; margin-bottom:2px;">לכבוד:</div>
+  <div style="font-size:10.5pt; position:relative;">
     ${fvBold(d.oname,'בעל הנכס')} - ${fvBold(d.ptype,'סוג')} ברחוב ${fvBold(d.addr,'כתובת')},
     <span style="float:left; font-weight:normal;">תאריך: ${fvBold(d.date)}</span>
   </div>
@@ -296,29 +296,29 @@ function renderAgreement1(d) {
 
 <div class="doc-title">"הסכם שימוש בלוקיישן ${fvBold(d.ptype,'בית')} בכתובת ${fvBold(d.addr,'_____')}"</div>
 
-<div style="margin-bottom:14px; line-height:1.8; font-size:11pt;">
+<div style="margin-bottom:6px; line-height:1.5; font-size:10.5pt;">
   <strong>בין</strong> ${fvBold(d.cname,'המזמין')} ${oidtype} – ${fvBold(d.cid,'ת.ז.')} להלן "חברת ההפקה" או "הלקוח"<br/>
   <strong>לבין</strong> ${fvBold(d.oname,'בעל הנכס')} ${oidtype} ${fvBold(d.oid,'מס\' מזהה')}, ${fvBold(d.ptype,'סוג הנכס')} <strong>ברחוב</strong> ${fvBold(d.addr,'כתובת')} - להלן "הלוקיישן".
 </div>
 
-<div style="margin-bottom:10px;">
+<div style="margin-bottom:5px;">
   הח"מ מצהירה שהיא מטעם ${fvBold(d.ptype,'_____')} בכתובת ${fvBold(d.addr,'_____')}, אשר מנוהל ע"י בעל הנכס, וכי חתימתה מחייבת את שותפיו וכן את הנכס.
 </div>
 
-<div style="margin-bottom:10px;">
+<div style="margin-bottom:5px;">
   חברת&nbsp;ההפקה ו/או "הלקוח" שוכרת את הנכס ${fvBold(d.ptype,'_____')}&nbsp;בכתובת&nbsp;${fvBold(d.addr,'_____')}&nbsp;בתאריך&nbsp;${fvBold(d.date2)}<br/>
   בין השעות&nbsp;${fvBold(d.tstart,'__:__')} - ${fvBold(d.tend,'__:__')}&rlm;<br/>
   בגין כל שעה נוספת יתבצע תשלום כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm;<br/>
   <strong>מטרת&nbsp;הצילומים:</strong>&nbsp;<span style="border-bottom:1px solid #111; padding:0 6px;">${purp || '<span style="color:#bbb;">_____</span>'}</span>
 </div>
 
-<div style="margin-bottom:10px;">
+<div style="margin-bottom:5px;">
   צוות ההפקה – עד&nbsp;${fvBold(d.crew,'X')}&nbsp;אנשים.&rlm; על כל איש צוות נוסף יתבצע תשלום נוסף כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm; מוסכם בזאת&nbsp;שלצורך&nbsp;הצילומים&nbsp;הבית&nbsp;והחצר&nbsp;יעמדו&nbsp;לרשות&nbsp;הלקוח.&rlm;
 </div>
 
-<div style="margin-bottom:10px;">הנכס&nbsp;יימסר&nbsp;לידי&nbsp;הלקוח&nbsp;כאשר&nbsp;הינו&nbsp;נקי.&rlm;</div>
+<div style="margin-bottom:5px;">הנכס&nbsp;יימסר&nbsp;לידי&nbsp;הלקוח&nbsp;כאשר&nbsp;הינו&nbsp;נקי.&rlm;</div>
 
-<div style="margin-bottom:10px;">
+<div style="margin-bottom:5px;">
   חברת&nbsp;ההפקה מתחייבת להחזיר&nbsp;את&nbsp;המצב&nbsp;לקדמותו&nbsp;בגמר&nbsp;יום&nbsp;הצילום.&rlm;<br/>
   וכן חברת&nbsp;ההפקה מתחייבת לשאת באחריות מלאה&nbsp;לכל&nbsp;נזק&nbsp;במידה&nbsp;ויגרם&nbsp;למקום בעקבות&nbsp;ובמהלך יום&nbsp;הצילום.&rlm;<br/>
   <span style="color:red;">הלקוח יבטח סיכוניו בקשר עם יום הצילומים,&rlm; ביטוח לעובדים ולציוד לרבות ביטוח צד&nbsp;ג'.&rlm; הלקוח אחראי&nbsp;לביטוח&nbsp;הנכס או תכולתו ביום הצילום בגין נזקים שיעשו למושכר ביום הצילומים,&rlm; שריפה&nbsp;וכו'.&rlm; המשכיר אינו אחראי&nbsp;לרכוש&nbsp;המפיק עובדיו ואורחיו ואינו נושא באחריות על כל נזק&nbsp;או פגיעה שעלולים להגרם למפיק,&rlm; עובדיו&nbsp;או&nbsp;אורחיו&nbsp;במהלך&nbsp;שהותם&nbsp;במקום.&rlm;</span>
@@ -335,10 +335,10 @@ function renderAgreement1(d) {
   <tr><td style="vertical-align:top;">&bull;</td><td>יתאפשר להשתמש בחשמל של הבית&nbsp;למטרת&nbsp;הצילומים.&rlm;</td></tr>
 </table>
 
-<div style="margin-bottom:6px;">חומר&nbsp;הגלם,&rlm; אופן השימוש בו ושיקולי העריכה הם של חברת&nbsp;ההפקה&nbsp;בלבד.&rlm;</div>
-<div style="margin-bottom:22px;">חברת&nbsp;ההפקה שומרת לעצמה&nbsp;את&nbsp;הזכות&nbsp;לביטול&nbsp;הצילומים.&rlm;</div>
+<div style="margin-bottom:4px;">חומר&nbsp;הגלם,&rlm; אופן השימוש בו ושיקולי העריכה הם של חברת&nbsp;ההפקה&nbsp;בלבד.&rlm;</div>
+<div style="margin-bottom:10px;">חברת&nbsp;ההפקה שומרת לעצמה&nbsp;את&nbsp;הזכות&nbsp;לביטול&nbsp;הצילומים.&rlm;</div>
 
-<div style="font-weight:700; margin-top:26px; margin-bottom:10px;">אנו&nbsp;הח"מ&nbsp;מאשרים&nbsp;את&nbsp;פרטי&nbsp;ההסכם</div>
+<div style="font-weight:700; margin-top:10px; margin-bottom:8px;">אנו&nbsp;הח"מ&nbsp;מאשרים&nbsp;את&nbsp;פרטי&nbsp;ההסכם</div>
 
 <table class="sig-table">
   <tr>
@@ -640,7 +640,7 @@ function renderAgreement3(d) {
 <div class="doc-title" style="text-decoration:none; text-align:right;"><strong>נספח א' - לוקיישן</strong></div>
 <div style="font-weight:700; text-decoration:underline; margin-bottom:15px;">נוסח הזמנה</div>
 
-<div class="clause" style="line-height:2.2;">
+<div class="clause" style="line-height:1.7;">
 הלקוח מזמין בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא ב ${fv(paddr, '____________________')} לרבות כל תכולתו, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
 </div>
 
@@ -649,44 +649,43 @@ function renderAgreement3(d) {
 <div class="clause">במידה ומספר אנשי הצוות יעלה על ${fv(crewNum, 'Y')} ועד ${fv(crewMaxTotal, 'Y+4')} לכל היותר, יחויב הלקוח בתוספת של ${fv(crewPrice, 'Z')} ש"ח לשעה לכל משתתף נוסף.</div>
 <div class="clause">דרישות נוספות הקשורות לנכס הינן כדלהלן: <span class="fv">${reqs ? reqs + ',' : ''}</span> <strong>ניקיון</strong>.</div>
 
-<div class="clause" style="margin-top: 10px;">
+<div class="clause" style="margin-top: 5px;">
 הלקוח יבצע את פעילותו בנכס תוך שמירה על הוראות הדין ויקפיד לשמור על הנכס וכל הרכוש הנמצא בו שמירה קפדנית ולהחזירו בתום הפעילות במצב זהה לזה שקיבלו. ככל ונגרם נזק כלשהו לנכס, ידווח הלקוח לספק השירותים על הנזק האמור. כל נזק לנכס או לרכוש שיהיה בו יהיה באחריותו ועל חשבונו של הלקוח.
 </div>
 
-<div class="clause" style="line-height:2.2; margin-top: 10px;">
+<div class="clause" style="line-height:1.7; margin-top: 4px;">
 התמורה בגין השימוש בנכס תהיה כדלהלן: בגין ${fv(hours, 'W')} שעות יחויב הלקוח בסכום של <span dir="ltr">${formattedPrice}</span> ₪ + מע"מ (בסה"כ ${fv(priceWithVat, '_______')} ₪).
 בגין שעה נוספת יחויב הלקוח בסכום של ${fv(formattedExtraBase, '900')} ₪${showMarketing ? ` ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% כלומר ${fv(formattedExtraBase, '900')} X 1.5 = <span dir="ltr">${fv(extra150, '1,350')}</span> ₪ + מע"מ` : ''}.
 </div>
 
-<div class="clause" style="margin-top: 10px; font-size: 0.95em;">
+<div class="clause" style="margin-top: 4px; font-size: 0.95em;">
 * התשלום לספק השירותים על ידי הלקוח יבוצע במעמד החתימה על טופס ההזמנה, או לכל היותר בתוך 3 ימים קלנדריים ממועד החתימה, ובכל מקרה לא יאוחר מ-3 ימים לפני מועד הצילום.
-<br>
-* כתובת מדויקת תשלח לאחר חתימה על הסכם זה.
+<br>* כתובת מדויקת תשלח לאחר חתימה על הסכם זה.
 </div>
 
-<div class="clause" style="margin-top: 10px;">
+<div class="clause" style="margin-top: 4px;">
 ידוע ללקוח כי הסכם זה אינו הסכם שכירות במקרקעין כהגדרתו בדין וספק השירותים אינו מתווך במקרקעין.
 </div>
 
-<div class="clause" style="margin-top: 10px;">
+<div class="clause" style="margin-top: 4px;">
 בכל מקרה של נזק אובדן או חיוב שיגרם לנכס במסגרת השימוש בו על ידי הלקוח, ישפה ויפצה הלקוח את בעל הנכס בסכום השווה לערכו של הנזק, לרבות כל ההוצאות הנלוות לו, הכוללות בין היתר כל נזק שיגרם לתכולתו וכיו"ב. ככל שיפעיל בעל הנכס את חברת הביטוח שלו, ישא הלקוח בכל הוצאות שיגרמו לבעל הנכס לרבות סכום ההשתתפות העצמית, אובדן הערך וכיו"ב.
 </div>
 
-<div class="clause" style="margin-top: 10px;">
+<div class="clause" style="margin-top: 4px;">
 הלקוח מתחייב לרכוש פוליסת ביטוח יעודית כמקובל בתעשיה ליום צילומים מהסוג האמור, ולהעביר לספק השירותים העתק מפוליסה זו.
 </div>
 
-<div class="clause" style="margin-top: 10px;">
+<div class="clause" style="margin-top: 4px;">
 הלקוח מתחייב להחזיר את הנכס לבעל הנכס כאשר הינו נקי ובמצב בו קיבלו. ככל ונגרם נזק לנכס או לתכולתו, יודיע הלקוח מיידית לספק השירותים על הנזק, וכל עלות שתידרש בגין התיקון תהיה באחריותו.
 </div>
 
-<div class="clause" style="margin-top: 15px;"><strong>שימוש בתכנים</strong></div>
-<div style="margin-right: 15px; margin-bottom: 5px;">
-<div style="margin-bottom: 5px;">• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לצלם תכנים "מאחורי הקלעים" המציגים את יום הצילום והשימוש בנכס, ולהשתמש בתכנים אלה לצורכי שיווק ופרסום, לרבות פרסום ממומן או לא ממומן, בכל פלטפורמה.</div>
+<div class="clause" style="margin-top: 8px;"><strong>שימוש בתכנים</strong></div>
+<div style="margin-right: 15px; margin-bottom: 4px;">
+<div style="margin-bottom: 3px;">• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לצלם תכנים "מאחורי הקלעים" המציגים את יום הצילום והשימוש בנכס, ולהשתמש בתכנים אלה לצורכי שיווק ופרסום, לרבות פרסום ממומן או לא ממומן, בכל פלטפורמה.</div>
 <div>• <span style="letter-spacing:1px">LOCK AND ACTION</span> רשאים לעשות שימוש גם בתכנים שיצרו הלקוח, המשתתפות והדף העסקי של הלקוח, לרבות פרסום ממומן, בכפוף לקרדיט מתאים ליוצרי התוכן.</div>
 </div>
 
-<div style="margin-top: 20px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
+<div style="margin-top: 10px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
 
 <table class="sig-table">
   <tr>

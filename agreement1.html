@@ -154,11 +154,12 @@
         <div class="sec-title">פרטי הנכס</div>
         <div class="frow">
           <label>סוג הנכס</label>
-          <select id="a1ptype" title="סוג הנכס" onchange="render1()">
-            <option value="">בחר...</option><option>דירה</option><option>בית פרטי</option>
+          <input id="a1ptype" list="a1ptypeList" type="text" placeholder="בחר או הכנס סוג נכס..." oninput="render1()" autocomplete="off" />
+          <datalist id="a1ptypeList">
+            <option>דירה</option><option>בית פרטי</option>
             <option>פנטהאוז</option><option>דופלקס</option><option>וילה</option>
             <option>סטודיו</option><option>חדר</option><option>נכס מסחרי</option>
-          </select>
+          </datalist>
         </div>
         <div class="frow"><label>כתובת הנכס</label><input id="a1addr" type="text" placeholder="רחוב, מספר, עיר..." oninput="render1()" /></div>
 

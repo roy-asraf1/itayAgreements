@@ -384,6 +384,7 @@ function renderAgreement2(d) {
   const req    = d.req;
 
   document.getElementById('doc-container').innerHTML = `
+<div style="line-height:1.75;">
 <div class="doc-title">הסכם מתן שירותים</div>
 <div style="text-align:center; margin-bottom: 20px;">שנערך ונחתם בתאריך ${fv(date, '_________')}</div>
 
@@ -502,6 +503,7 @@ function renderAgreement2(d) {
     <td><div class="sig-line">ספק השירותים<br/>איתי ראובני</div></td>
   </tr>
 </table>
+</div>
 `;
 }
 
@@ -637,8 +639,9 @@ function renderAgreement3(d) {
 
 <div class="page-break"></div>
 
+<div style="font-size:9.5pt; line-height:1.3;">
 <div class="doc-title" style="text-decoration:none; text-align:right;"><strong>נספח א' - לוקיישן</strong></div>
-<div style="font-weight:700; text-decoration:underline; margin-bottom:15px;">נוסח הזמנה</div>
+<div style="font-weight:700; text-decoration:underline; margin-bottom:10px;">נוסח הזמנה</div>
 
 <div class="clause" style="line-height:1.7;">
 הלקוח מזמין בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא ב ${fv(paddr, '____________________')} לרבות כל תכולתו, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
@@ -698,6 +701,7 @@ function renderAgreement3(d) {
     <td><div class="sig-line">ספק השירותים<br/>איתי ראובני</div></td>
   </tr>
 </table>
+</div>
 `;
 }
 

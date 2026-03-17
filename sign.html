@@ -6,7 +6,7 @@
   <title>Lock and Action – חתימה על הסכם</title>
   <link rel="icon" href="l.jpg" type="image/jpeg">
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -192,15 +192,6 @@
 <script>
 "use strict";
 
-/* ═══════════════════════════════════════════════════════
-   ⚙️  הגדרות EmailJS — החלף את הערכים שלהל
-   ═══════════════════════════════════════════════════════ */
-const EMAILJS_PUBLIC_KEY  = 'gEFid_j2titioXBb8';    // ← הכנס Public Key מ-EmailJS
-const EMAILJS_SERVICE_ID  = 'service_33cxjy5';   // ← Service ID (קיים)
-const EMAILJS_TEMPLATE_ID = 'template_lpbkp4p';  // ← Template ID
-/* ═══════════════════════════════════════════════════════ */
-
-(function(){ emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); })();
 
 /* ── Helpers ── */
 function fv(val, fallback) {
@@ -725,19 +716,47 @@ async function sendAgreement() {
       : (agreementData.oname || agreementData.cname || 'לא צוין');
     const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:        'roy2796@gmail.com, itay@lockandaction.co.il',
-      signer_name:     signerName,
-      agreement_type:  agreementNames[agreementType] || 'הסכם',
-      sign_date:       signDate,
-      content_html:    contentHtml
+    // Generate PDF from agreement HTML
+    const pdfContainer = document.createElement('div');
+    pdfContainer.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;padding:40px;background:#fff;font-family:Arial,sans-serif;direction:rtl;color:#1e2b3c;';
+    pdfContainer.innerHTML = contentHtml;
+    document.body.appendChild(pdfContainer);
+
+    const pdfBlob = await html2pdf().set({
+      margin: [10, 10],
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(pdfContainer).outputPdf('blob');
+    document.body.removeChild(pdfContainer);
+
+    const pdfBase64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.readAsDataURL(pdfBlob);
     });
+
+    // Send PDF via API
+    const resp = await fetch('/api/send-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pdfBase64,
+        signerName,
+        agreementType: agreementNames[agreementType] || 'הסכם',
+        signDate
+      })
+    });
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error || 'שגיאה בשליחה');
+    }
 
     document.getElementById('mainContent').style.display = 'none';
     document.getElementById('successState').style.display = 'flex';
 
   } catch(err) {
-    console.error('EmailJS error:', err);
+    console.error('Send error:', err);
     btn.disabled = false;
     btn.innerHTML = '✅ חתום ושלח';
     alert('שגיאה בשליחה:\n' + (err.text || err.message || JSON.stringify(err)));

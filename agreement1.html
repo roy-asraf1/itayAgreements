@@ -178,6 +178,7 @@
         </div>
 
         <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
+        <button class="btn-gen" onclick="generateSignLink()" style="background:linear-gradient(135deg,#27ae60,#1e8449); margin-top:10px;">📤 שלח לחתימה</button>
         <button class="btn-preview-toggle" id="togglePreviewBtn" onclick="togglePreview()">👁 הצג תצוגה מקדימה</button>
       </div>
 
@@ -193,6 +194,37 @@
       </div>
     </div>
   </section>
+
+  <!-- Share Modal (2 links for agreement 1) -->
+  <div id="shareModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:#fff; border-radius:16px; padding:28px 24px; max-width:520px; width:100%; text-align:center; direction:rtl; box-shadow:0 20px 60px rgba(0,0,0,.4); max-height:90vh; overflow-y:auto;">
+      <div style="font-size:2rem; margin-bottom:8px;">🔗</div>
+      <h3 style="color:#1a3a6b; margin-bottom:4px;">שני לינקים לחתימה!</h3>
+      <p style="color:#6b7a8d; font-size:.85rem; margin-bottom:20px;">שלח כל לינק לצד המתאים</p>
+
+      <!-- Owner link -->
+      <div style="background:#f0f4ff; border-radius:10px; padding:14px; margin-bottom:14px; text-align:right;">
+        <div style="font-weight:700; color:#1a3a6b; margin-bottom:8px; font-size:.93rem;">🏠 לינק לבעל הנכס</div>
+        <input id="ownerLinkInput" type="text" readonly style="width:100%; padding:8px 10px; border:1px solid #dde; border-radius:7px; font-size:.78rem; direction:ltr; background:#fff; margin-bottom:8px;" onclick="this.select()" />
+        <div style="display:flex; gap:8px;">
+          <button onclick="copyLink('ownerLinkInput')" style="flex:1; padding:9px; background:#1a3a6b; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:.85rem;">📋 העתק</button>
+          <button onclick="sendWA('ownerLinkInput', 'בעל הנכס')" style="flex:1; padding:9px; background:#25D366; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:.85rem;">💬 WhatsApp</button>
+        </div>
+      </div>
+
+      <!-- Client link -->
+      <div style="background:#f0fff4; border-radius:10px; padding:14px; margin-bottom:16px; text-align:right;">
+        <div style="font-weight:700; color:#1a7a3a; margin-bottom:8px; font-size:.93rem;">👤 לינק למזמין</div>
+        <input id="clientLinkInput" type="text" readonly style="width:100%; padding:8px 10px; border:1px solid #dde; border-radius:7px; font-size:.78rem; direction:ltr; background:#fff; margin-bottom:8px;" onclick="this.select()" />
+        <div style="display:flex; gap:8px;">
+          <button onclick="copyLink('clientLinkInput')" style="flex:1; padding:9px; background:#1a7a3a; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:.85rem;">📋 העתק</button>
+          <button onclick="sendWA('clientLinkInput', 'המזמין')" style="flex:1; padding:9px; background:#25D366; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; font-size:.85rem;">💬 WhatsApp</button>
+        </div>
+      </div>
+
+      <button onclick="document.getElementById('shareModal').style.display='none'" style="background:none; border:none; color:#6b7a8d; cursor:pointer; font-family:inherit; font-size:.9rem;">סגור</button>
+    </div>
+  </div>
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -343,6 +375,41 @@
 
     function downloadPDF() {
       window.print();
+    }
+
+    function generateSignLink() {
+      function rawVal(id) {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : '';
+      }
+      const baseData = {
+        date:    rawVal('a1date'),
+        date2:   rawVal('a1date2'),
+        tstart:  rawVal('a1tstart'),
+        tend:    rawVal('a1tend'),
+        oname:   rawVal('a1oname'),
+        oidtype: rawVal('a1oidtype') || 'ת.ז.',
+        oid:     rawVal('a1oid'),
+        cname:   rawVal('a1cname'),
+        cid:     rawVal('a1cid'),
+        ptype:   rawVal('a1ptype'),
+        addr:    rawVal('a1addr'),
+        crew:    rawVal('a1crew'),
+        purp:    getPurp1()
+      };
+      const ownerUrl  = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'owner', data: baseData }))));
+      const clientUrl = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'client', data: baseData }))));
+      document.getElementById('ownerLinkInput').value  = ownerUrl;
+      document.getElementById('clientLinkInput').value = clientUrl;
+      document.getElementById('shareModal').style.display = 'flex';
+    }
+    function copyLink(inputId) {
+      const input = document.getElementById(inputId);
+      navigator.clipboard.writeText(input.value).then(() => alert('הלינק הועתק!')).catch(() => { input.select(); document.execCommand('copy'); alert('הועתק!'); });
+    }
+    function sendWA(inputId, role) {
+      const url = document.getElementById(inputId).value;
+      window.open('https://wa.me/?text=' + encodeURIComponent('שלום, אנא קרא וחתום על ההסכם (' + role + '): ' + url), '_blank');
     }
 
     function togglePreview() {

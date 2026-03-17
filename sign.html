@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lock and Action – חתימה על הסכם</title>
+  <link rel="icon" href="l.jpg" type="image/jpeg">
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f2647; --blue: #1a3a6b; --gold: #c8a84b; --goldlt: #f0d86e;
+      --bg: #0d1c35; --white: #ffffff; --offwh: #f7f8fc;
+      --text: #1e2b3c; --muted: #6b7a8d; --border: #dde2ea;
+      --radius: 16px; --shadow: 0 8px 40px rgba(0,0,0,.22);
+    }
+    body { font-family: 'Segoe UI','Arial Hebrew',Arial,sans-serif; background: linear-gradient(160deg,var(--bg) 0%,var(--blue) 100%); min-height:100vh; color:var(--text); direction:rtl; }
+
+    /* ── Header ── */
+    .site-header { position:sticky; top:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:12px 20px; background:rgba(15,38,71,.97); border-bottom:1px solid rgba(200,168,75,.25); }
+    .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .logo-icon { width:42px; height:42px; border-radius:9px; overflow:hidden; flex-shrink:0; }
+    .logo-icon img { width:100%; height:100%; object-fit:cover; display:block; }
+    .logo-title { color:#fff; font-size:17px; font-weight:700; }
+    .logo-sub { color:var(--gold); font-size:11px; }
+
+    /* ── States ── */
+    .state { display:flex; align-items:center; justify-content:center; min-height:calc(100vh - 68px); }
+    .state-box { background:#fff; border-radius:var(--radius); padding:40px 32px; text-align:center; max-width:420px; width:92%; box-shadow:var(--shadow); }
+    .state-box h2 { color:var(--blue); margin-bottom:12px; }
+    .state-box p { color:var(--muted); line-height:1.6; }
+    .spinner { width:38px; height:38px; border:4px solid #eee; border-top-color:var(--blue); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Welcome ── */
+    .welcome-section { max-width:860px; margin:28px auto 0; padding:0 16px; }
+    .welcome-card { background:rgba(255,255,255,.08); border:1px solid rgba(200,168,75,.3); border-radius:var(--radius); padding:22px 26px; color:#fff; }
+    .welcome-greeting { font-size:1.25rem; font-weight:700; color:var(--gold); margin-bottom:7px; }
+    .welcome-msg { color:rgba(255,255,255,.85); line-height:1.65; font-size:.95rem; }
+
+    /* ── Document ── */
+    .doc-section { max-width:860px; margin:22px auto 0; padding:0 16px; }
+    .doc-outer { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+    .doc-scale-outer { width:100%; overflow:hidden; position:relative; }
+
+    #doc-container {
+      width: 794px; /* A4 at 96dpi */
+      padding: 18mm 16mm;
+      background: #ffffff;
+      direction: rtl;
+      text-align: right;
+      font-family: Tahoma, Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.55;
+      color: #111;
+    }
+
+    /* Document internals */
+    #doc-container .doc-title { text-align:center; font-size:19px; font-weight:700; text-decoration:underline; margin-bottom:14px; }
+    #doc-container .clause { margin-bottom:7px; text-align:justify; unicode-bidi:embed; }
+    #doc-container .fv { font-weight:600; }
+    #doc-container .fv.empty { color:#bbb; }
+    #doc-container .dynamic-val { font-weight:bold; }
+    #doc-container .sig-table { width:100%; margin-top:28px; border-collapse:collapse; }
+    #doc-container .sig-table td { width:50%; text-align:center; vertical-align:top; padding:10px; }
+    #doc-container .sig-line { margin-top:18px; border-top:1px solid #333; width:65%; margin-left:auto; margin-right:auto; padding-top:5px; font-size:10pt; color:#444; }
+    #doc-container .page-break { margin:36px 0; border-top:2px dashed #ccc; text-align:center; color:#888; font-size:11px; padding-top:8px; page-break-before:always; }
+
+    /* ── Signature Section ── */
+    .sign-section { max-width:860px; margin:22px auto 60px; padding:0 16px; }
+    .sign-card { background:#fff; border-radius:var(--radius); padding:28px 28px 32px; box-shadow:var(--shadow); }
+    .sign-card h3 { color:var(--blue); font-size:1.15rem; border-bottom:3px solid var(--gold); padding-bottom:9px; margin-bottom:14px; }
+    .sign-instructions { color:var(--muted); font-size:.88rem; margin-bottom:14px; line-height:1.5; }
+
+    .sig-pad-wrapper { border:2px solid var(--border); border-radius:12px; background:#fafafa; position:relative; overflow:hidden; }
+    canvas#sigCanvas { width:100%; height:175px; display:block; touch-action:none; cursor:crosshair; }
+    .sig-hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#ccc; font-size:.95rem; pointer-events:none; transition:opacity .25s; }
+
+    .sig-actions { display:flex; gap:12px; margin-top:13px; }
+    .btn-clear { padding:10px 22px; background:transparent; border:1.5px solid #ccc; border-radius:9px; color:var(--muted); cursor:pointer; font-family:inherit; font-size:.9rem; transition:.2s; }
+    .btn-clear:hover { border-color:#999; color:#555; }
+    .btn-submit { flex:1; padding:14px; background:linear-gradient(135deg,#27ae60,#1e8449); border:none; border-radius:12px; color:#fff; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; box-shadow:0 5px 18px rgba(39,174,96,.35); transition:.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(39,174,96,.45); }
+    .btn-submit:disabled { background:#aaa; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    /* ── Success ── */
+    #successState .state-box h2 { color:#27ae60; font-size:1.5rem; }
+    #successState .state-box .icon { font-size:3rem; margin-bottom:14px; }
+
+    /* ── Responsive ── */
+    @media (max-width:600px) {
+      .site-header { padding:10px 14px; }
+      .sign-card { padding:20px 16px 24px; }
+      .welcome-card { padding:16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="index.html">
+    <div class="logo-icon"><img src="l.jpg" alt="LA"></div>
+    <div>
+      <div class="logo-title">Lock and Action</div>
+      <div class="logo-sub">A New Standard in Productions</div>
+    </div>
+  </a>
+</header>
+
+<!-- Loading -->
+<div id="loadingState" class="state">
+  <div class="state-box">
+    <div class="spinner"></div>
+    <p>טוען את ההסכם...</p>
+  </div>
+</div>
+
+<!-- Error -->
+<div id="errorState" class="state" style="display:none">
+  <div class="state-box">
+    <div style="font-size:2.8rem; margin-bottom:14px;">⚠️</div>
+    <h2>קישור לא תקין</h2>
+    <p>הקישור שקיבלת אינו תקין או פג תוקפו.<br>פנה לאיתי ראובני לקבלת קישור חדש.</p>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div id="mainContent" style="display:none">
+
+  <div class="welcome-section">
+    <div class="welcome-card">
+      <div class="welcome-greeting" id="welcomeGreeting">שלום!</div>
+      <div class="welcome-msg" id="welcomeMsg">לפניך הסכם אשר מחייב חתימתך. נא לקרוא בעיון ולחתום בתחתית הדף.</div>
+    </div>
+  </div>
+
+  <div class="doc-section">
+    <div class="doc-outer">
+      <div class="doc-scale-outer" id="docScaleOuter">
+        <div id="doc-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sign-section">
+    <div class="sign-card">
+      <h3 id="sigTitle">✍️ חתימה</h3>
+      <p class="sign-instructions">חתום/י בתיבה למטה עם האצבע (בנייד) או עם העכבר. לאחר החתימה לחץ/י על "חתום ושלח".</p>
+      <div class="sig-pad-wrapper">
+        <canvas id="sigCanvas"></canvas>
+        <div class="sig-hint" id="sigHint">חתום/י כאן</div>
+      </div>
+      <div class="sig-actions">
+        <button class="btn-clear" onclick="clearSig()">🗑 נקה</button>
+        <button class="btn-submit" id="submitBtn" onclick="sendAgreement()">✅ חתום ושלח</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Success -->
+<div id="successState" class="state" style="display:none">
+  <div class="state-box">
+    <div class="icon">✅</div>
+    <h2>ההסכם נחתם ונשלח!</h2>
+    <p style="margin-top:10px; line-height:1.7;">תודה! ההסכם החתום הועבר לאיתי ראובני בהצלחה.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════
+   ⚙️  הגדרות EmailJS — החלף את הערכים שלהל
+   ═══════════════════════════════════════════════════════ */
+const EMAILJS_PUBLIC_KEY  = 'gEFid_j2titioXBb8';    // ← הכנס Public Key מ-EmailJS
+const EMAILJS_SERVICE_ID  = 'service_33cxjy5';   // ← Service ID (קיים)
+const EMAILJS_TEMPLATE_ID = 'template_Ipbkp4p';  // ← הכנס Template ID מ-EmailJS
+/* ═══════════════════════════════════════════════════════ */
+
+(function(){ emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); })();
+
+/* ── Helpers ── */
+function fv(val, fallback) {
+  if (!val || String(val).trim() === '')
+    return `<span class="fv empty">${fallback || '___'}</span>`;
+  return `<span class="fv">${val}</span>`;
+}
+function fvBold(val, ph) {
+  const p = (ph && !ph.includes('_')) ? ph : '';
+  if (!val) return `&nbsp;<b class="dynamic-val" style="color:#bbb;">${p}</b>&nbsp;`;
+  return `&nbsp;<b class="dynamic-val">${val}</b>&nbsp;`;
+}
+function addCommas(num) {
+  if (!num) return '';
+  return Number(num).toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+
+/* ── Parse URL Hash ── */
+let agreementType = null;
+let agreementData = null;
+let agreementRole = null; // 'owner' | 'client' | null (for agreement1)
+
+function init() {
+  try {
+    const hash = location.hash.slice(1);
+    if (!hash) throw new Error('no hash');
+    const json = decodeURIComponent(escape(atob(hash)));
+    const parsed = JSON.parse(json);
+    agreementType = parseInt(parsed.type, 10);
+    agreementData = parsed.data;
+    agreementRole = parsed.role || null;
+    if (![1, 2, 3].includes(agreementType)) throw new Error('bad type');
+
+    renderAgreement();
+    setWelcomeMessage();
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    window.addEventListener('resize', scaleDoc);
+    scaleDoc();
+    resizeSigCanvas();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'flex';
+  }
+}
+
+/* ── Welcome messages ── */
+function setWelcomeMessage() {
+  const d = agreementData;
+  let name = '', msg = '', sigTitle = '';
+
+  if (agreementType === 1) {
+    const isOwner = agreementRole === 'owner';
+    name     = isOwner ? (d.oname || '') : (d.cname || '');
+    msg      = `לפניך הסכם שימוש בלוקיישן${d.addr ? ' בכתובת <strong>' + d.addr + '</strong>' : ''}${d.date2 ? ' בתאריך <strong>' + d.date2 + '</strong>' : ''}.<br>נא לקרוא בעיון ולחתום.`;
+    sigTitle = isOwner ? '✍️ חתימת בעל הנכס' : '✍️ חתימת המזמין';
+  } else if (agreementType === 2) {
+    name     = d.oname || '';
+    msg      = `לפניך הסכם מתן שירותים בינך לבין <strong>איתי ראובני – Lock and Action</strong>.<br>נא לקרוא ולחתום בשני המקומות המסומנים.`;
+    sigTitle = '✍️ חתימת בעל הנכס';
+  } else if (agreementType === 3) {
+    name     = d.cname || '';
+    msg      = `לפניך הסכם מתן שירותים בינך לבין <strong>איתי ראובני – Lock and Action</strong>.<br>נא לקרוא ולחתום בשני המקומות המסומנים.`;
+    sigTitle = '✍️ חתימת הלקוח';
+  }
+
+  if (name) document.getElementById('welcomeGreeting').textContent = `שלום ${name},`;
+  document.getElementById('welcomeMsg').innerHTML = msg;
+  document.getElementById('sigTitle').textContent = sigTitle;
+}
+
+/* ── Render dispatcher ── */
+function renderAgreement() {
+  if (agreementType === 1) renderAgreement1(agreementData);
+  else if (agreementType === 2) renderAgreement2(agreementData);
+  else if (agreementType === 3) renderAgreement3(agreementData);
+}
+
+/* ══════════════════════════════════════════════════════
+   AGREEMENT 1 — הסכם שימוש בלוקיישן (בעל נכס + מזמין)
+   ══════════════════════════════════════════════════════ */
+function renderAgreement1(d) {
+  const oidtype = d.oidtype || 'ת.ז.';
+  const purp = d.purp || '';
+  document.getElementById('doc-container').innerHTML = `
+<div style="margin-bottom:22px; line-height:1.6; text-align:right;">
+  <div style="font-weight:bold; font-size:13pt; margin-bottom:4px;">לכבוד:</div>
+  <div style="font-size:11pt; position:relative;">
+    ${fvBold(d.oname,'בעל הנכס')} - ${fvBold(d.ptype,'סוג')} ברחוב ${fvBold(d.addr,'כתובת')},
+    <span style="float:left; font-weight:normal;">תאריך: ${fvBold(d.date)}</span>
+  </div>
+  <div style="clear:both;"></div>
+</div>
+
+<div class="doc-title">"הסכם שימוש בלוקיישן ${fvBold(d.ptype,'בית')} בכתובת ${fvBold(d.addr,'_____')}"</div>
+
+<div style="margin-bottom:14px; line-height:1.8; font-size:11pt;">
+  <strong>בין</strong> ${fvBold(d.cname,'המזמין')} ${oidtype} – ${fvBold(d.cid,'ת.ז.')} להלן "חברת ההפקה" או "הלקוח"<br/>
+  <strong>לבין</strong> ${fvBold(d.oname,'בעל הנכס')} ${oidtype} ${fvBold(d.oid,'מס\' מזהה')}, ${fvBold(d.ptype,'סוג הנכס')} <strong>ברחוב</strong> ${fvBold(d.addr,'כתובת')} - להלן "הלוקיישן".
+</div>
+
+<div style="margin-bottom:10px;">
+  הח"מ מצהירה שהיא מטעם ${fvBold(d.ptype,'_____')} בכתובת ${fvBold(d.addr,'_____')}, אשר מנוהל ע"י בעל הנכס, וכי חתימתה מחייבת את שותפיו וכן את הנכס.
+</div>
+
+<div style="margin-bottom:10px;">
+  חברת&nbsp;ההפקה ו/או "הלקוח" שוכרת את הנכס ${fvBold(d.ptype,'_____')}&nbsp;בכתובת&nbsp;${fvBold(d.addr,'_____')}&nbsp;בתאריך&nbsp;${fvBold(d.date2)}<br/>
+  בין השעות&nbsp;${fvBold(d.tstart,'__:__')} - ${fvBold(d.tend,'__:__')}&rlm;<br/>
+  בגין כל שעה נוספת יתבצע תשלום כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm;<br/>
+  <strong>מטרת&nbsp;הצילומים:</strong>&nbsp;<span style="border-bottom:1px solid #111; padding:0 6px;">${purp || '<span style="color:#bbb;">_____</span>'}</span>
+</div>
+
+<div style="margin-bottom:10px;">
+  צוות ההפקה – עד&nbsp;${fvBold(d.crew,'X')}&nbsp;אנשים.&rlm; על כל איש צוות נוסף יתבצע תשלום נוסף כפי שסוכם עם איתי מ-<span style="letter-spacing:1px">LOCK AND ACTION</span>.&rlm; מוסכם בזאת&nbsp;שלצורך&nbsp;הצילומים&nbsp;הבית&nbsp;והחצר&nbsp;יעמדו&nbsp;לרשות&nbsp;הלקוח.&rlm;
+</div>
+
+<div style="margin-bottom:10px;">הנכס&nbsp;יימסר&nbsp;לידי&nbsp;הלקוח&nbsp;כאשר&nbsp;הינו&nbsp;נקי.&rlm;</div>
+
+<div style="margin-bottom:10px;">
+  חברת&nbsp;ההפקה מתחייבת להחזיר&nbsp;את&nbsp;המצב&nbsp;לקדמותו&nbsp;בגמר&nbsp;יום&nbsp;הצילום.&rlm;<br/>
+  וכן חברת&nbsp;ההפקה מתחייבת לשאת באחריות מלאה&nbsp;לכל&nbsp;נזק&nbsp;במידה&nbsp;ויגרם&nbsp;למקום בעקבות&nbsp;ובמהלך יום&nbsp;הצילום.&rlm;<br/>
+  <span style="color:red;">הלקוח יבטח סיכוניו בקשר עם יום הצילומים,&rlm; ביטוח לעובדים ולציוד לרבות ביטוח צד&nbsp;ג'.&rlm; הלקוח אחראי&nbsp;לביטוח&nbsp;הנכס או תכולתו ביום הצילום בגין נזקים שיעשו למושכר ביום הצילומים,&rlm; שריפה&nbsp;וכו'.&rlm; המשכיר אינו אחראי&nbsp;לרכוש&nbsp;המפיק עובדיו ואורחיו ואינו נושא באחריות על כל נזק&nbsp;או פגיעה שעלולים להגרם למפיק,&rlm; עובדיו&nbsp;או&nbsp;אורחיו&nbsp;במהלך&nbsp;שהותם&nbsp;במקום.&rlm;</span>
+</div>
+
+<div style="margin-bottom:6px;">את התמורה בגין יום הצילום יקבל בעל הנכס מאיתי ראובני "<span style="letter-spacing:1px">LOCK AND ACTION</span>" אשר&nbsp;הינה&nbsp;קשורה&nbsp;עימו&nbsp;בחוזה&nbsp;תמורה.&rlm;</div>
+<div style="margin-bottom:10px;">המשכיר יספק נציג צמוד מטעם&nbsp;הבית&nbsp;שילווה&nbsp;את&nbsp;הלקוח&nbsp;לאורך&nbsp;הצילומים.&rlm;</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:10px;" dir="rtl">
+  <tr><td style="width:18px; vertical-align:top;">&bull;</td><td>יתאפשר להכניס לבית ציוד&nbsp;צילום,&rlm; תאורה,&rlm; הפקה&nbsp;וארט.&rlm;</td></tr>
+  <tr><td style="vertical-align:top;">&bull;</td><td>יתאפשר לפתוח ארוחת בוקר וצהרים&nbsp;בחצר&nbsp;הבית&nbsp;לצוות&nbsp;ההפקה.&rlm;</td></tr>
+  <tr><td style="vertical-align:top;">&bull;</td><td>יתאפשר&nbsp;להשתמש&nbsp;בחדרים&nbsp;למטרת&nbsp;איפור&nbsp;והלבשה.&rlm;</td></tr>
+  <tr><td style="vertical-align:top;">&bull;</td><td>יתאפשר&nbsp;להזיז&nbsp;חפצים&nbsp;שונים&nbsp;בבית&nbsp;למטרת&nbsp;הצילום&nbsp;ולהחזירם&nbsp;למקומם.&rlm;</td></tr>
+  <tr><td style="vertical-align:top;">&bull;</td><td>יתאפשר להשתמש בחשמל של הבית&nbsp;למטרת&nbsp;הצילומים.&rlm;</td></tr>
+</table>
+
+<div style="margin-bottom:6px;">חומר&nbsp;הגלם,&rlm; אופן השימוש בו ושיקולי העריכה הם של חברת&nbsp;ההפקה&nbsp;בלבד.&rlm;</div>
+<div style="margin-bottom:22px;">חברת&nbsp;ההפקה שומרת לעצמה&nbsp;את&nbsp;הזכות&nbsp;לביטול&nbsp;הצילומים.&rlm;</div>
+
+<div style="font-weight:700; margin-top:26px; margin-bottom:10px;">אנו&nbsp;הח"מ&nbsp;מאשרים&nbsp;את&nbsp;פרטי&nbsp;ההסכם</div>
+
+<table class="sig-table">
+  <tr>
+    <td>
+      <div style="text-align:center;">
+        <div id="sig-owner" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
+        <div class="sig-line">בעל הנכס ${oidtype} <strong>${d.oid || '_____'}</strong><br/>${d.oname || 'שם בעל הנכס'}</div>
+      </div>
+    </td>
+    <td>
+      <div style="text-align:center;">
+        <div id="sig-client" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
+        <div class="sig-line">המזמין ת.ז <strong>${d.cid || '_____'}</strong><br/>${d.cname || 'שם המזמין'}</div>
+      </div>
+    </td>
+  </tr>
+</table>
+`;
+}
+
+/* ══════════════════════════════════════════════════════
+   AGREEMENT 2 — הסכם מתן שירותים (בעל נכס ↔ איתי)
+   ══════════════════════════════════════════════════════ */
+function renderAgreement2(d) {
+  function fDate(str) {
+    if (!str) return null;
+    const [y,m,dd] = str.split('-');
+    return `${dd}/${m}/${y}`;
+  }
+  const dateDisp = d.date ? fDate(d.date) : null;
+  const sdateDisp = d.sdate ? fDate(d.sdate) : null;
+
+  document.getElementById('doc-container').innerHTML = `
+<div class="doc-title">הסכם מתן שירותים</div>
+<div style="text-align:center; margin-bottom:18px;">שנערך ונחתם בתאריך ${fv(dateDisp,'_________')}</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:18px;">ב י ן</div>
+<div style="text-align:center; margin-bottom:18px;">
+  בעל הנכס <strong>${fv(d.oname,'____________________')}</strong><br>
+  ת.ז <strong>${fv(d.oid,'____________________')}</strong><br>
+  בכתובת: <strong>${fv(d.addr,'____________________')}</strong><br>
+  (להלן: "בעל הנכס")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:4px;">מצד אחד</div>
+</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:18px;">ל ב י ן</div>
+<div style="text-align:center; margin-bottom:26px;">
+  <strong>איתי ראובני – lock And Action</strong><br>ע.מ 208777367<br>מרחוב שניר 112, כפר ורדים<br>(להלן: "ספק השירותים")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:4px;">מצד שני</div>
+</div>
+
+<div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו שירותי איתור לוקיישנים ואובייקטים שונים לימי צילום, הכולל ליווי שוטף וכן התקשרות בהסכם עם בעל הנכס כשלוח וכנציג מטעם הלקוח ("השירותים");&rlm;</div>
+<div class="clause"><strong>והואיל:</strong> ובעל הנכס&rlm;, הינו הבעלים החוקי והמחזיק הבלעדי של הנכס המפורט בנספח א';&rlm;</div>
+<div class="clause"><strong>והואיל:</strong> ובעל הנכס מעוניין להתקשר עם השלוח אשר מהווה את שלוחו של הלקוח ופועל מטעמו, ולספק ללקוח זכות שימוש בנכס;&rlm;</div>
+<div class="clause" style="margin-bottom:22px;"><strong>והואיל:</strong> וברצון הצדדים להסדיר את היחסים המשפטיים ביניהם;&rlm;</div>
+<div style="margin-bottom:13px;"><strong>לפיכך הוצהר,&rlm; הותנה והוסכם בין הצדדים כדלקמן:</strong></div>
+
+<div class="clause"><strong>1. הגדרות ופרשנות</strong></div>
+<div class="clause">1.1. חלוקתו של הסכם זה לסעיפים ומתן כותרות לסעיפים נעשו כמראי מקום בלבד.</div>
+<div class="clause" style="margin-bottom:13px;">1.2. המבוא להסכם זה מהווה חלק בלתי נפרד הימנו.</div>
+
+<div class="clause"><strong>2. מהות ההסכם</strong></div>
+<div class="clause">2.1. השלוח מזמין בזאת מבעל הנכס את השימוש בנכס לצורך ביצוע יום צילומים בהתאם לתנאים המפורטים בהסכם זה.</div>
+<div class="clause">2.2. הנכסים אשר את השימוש בהם מעוניין השלוח להזמין מבעל הנכס, לרבות זמני השימוש, מצ"ב להלן כנספח א'.</div>
+<div class="clause">2.3. מובהר לבעל הנכס כי כל טענה תביעה או דרישה שתהא לו למול לקוח, תופנה ישירות ללקוח בהתאמה&rlm;, ואינה באחריותו של ספק השירותים.</div>
+<div class="clause">2.4. <span style="color:red;">ביטוח. בעל הנכס מתחייב כי הנכס מבוטח בפוליסת ביטוח בסכומים המקובלים בתעשיה. בעל הנכס ימציא לספק השירותים אישור על קיום ביטוחים במעמד חתימת הסכם זה. החזקת פוליסה כאמור בתוקף לכל אורך תקופת ההסכם הינה תנאי חובה להסכם זה.</span></div>
+<div class="clause">2.5. בעל הנכס מתחייב כי לא יפנה ולא יקיים כל קשר עם לקוח שהופנה אליו על ידי ספק השירותים, ללא אישורו.</div>
+<div class="clause" style="margin-bottom:13px;">2.6. ככל וימצא לקוח המעוניין לבצע שימוש בנכס לצורך יום צילומים, יחתום בעל הנכס על נספח יציאה לסיור.</div>
+
+<div class="clause"><strong>3. הצהרות הצדדים</strong></div>
+<div class="clause">3.1. כל צד מצהיר כי אין מניעה או הגבלה חוזית חוקית או אחרת להתקשרותו בהסכם זה.</div>
+<div class="clause" style="margin-bottom:13px;">3.2. השלוח מצהיר כי הלקוח התחייב לשמור על הנכס וכל הרכוש הנמצא בו ולהחזירו בתום הפעילות במצב זהה לזה שקיבלו.</div>
+
+<div class="clause"><strong>4. התמורה</strong></div>
+<div class="clause">4.1. בגין השימוש בנכס, ישלם השלוח לבעל הנכס, בשם הלקוח, את התמורה כפי המפורט בנספח א'.</div>
+<div class="clause">4.2. השלוח יהא רשאי לבטל את הזמנת הנכס בהודעה מראש ובכתב לבעל הנכס של 3 ימים.</div>
+<div class="clause" style="margin-bottom:13px;">4.3. התשלום לבעל הנכס יעשה בכפוף לקבלת חשבונית מס מבעל הנכס.</div>
+
+<div class="clause"><strong>5. תקופת ההסכם</strong></div>
+<div class="clause" style="margin-bottom:13px;">5.1. תקופת ההתקשרות תחל ביום חתימת הסכם זה ותהא בתוקף עד לסיום השימוש בנכס והחזרתו לבעל הנכס.</div>
+
+<div class="clause"><strong>6. סודיות</strong></div>
+<div class="clause" style="margin-bottom:13px;">כל צד מצהיר ומתחייב לשמור בסודיות מוחלטת ולא לבצע כל שימוש במידע הקשור לצד השני, לרבות תוכן הסכם זה, במשך תקופת ההתקשרות וכן לאחריה.</div>
+
+<div class="clause"><strong>7. היעדר אחריות</strong></div>
+<div class="clause" style="margin-bottom:13px;">7.1. ספק השירותים ו/או מי מטעמו לא יהיה אחראי בשום מקרה לנזקים שיגרמו לבעל הנכס בקשר עם השירותים על פי הסכם זה.</div>
+
+<div class="clause"><strong>8. שונות</strong></div>
+<div class="clause">8.1. הסכם זה מבטא את כל ההסכמות באופן מלא וממצה בין הצדדים.</div>
+<div class="clause" style="margin-bottom:22px;">8.2. כל שינוי של הוראה מהוראות הסכם זה ייעשה בכתב ובחתימת הצדדים.</div>
+
+<div style="margin-bottom:18px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
+<table class="sig-table">
+  <tr>
+    <td>
+      <div style="text-align:center;">
+        <div id="sig-placeholder-1" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
+        <div class="sig-line">בעל הנכס<br/>${fv(d.oname,'________________')}</div>
+      </div>
+    </td>
+    <td><div class="sig-line">ספק השירותים<br/>איתי ראובני</div></td>
+  </tr>
+</table>
+
+<div class="page-break">— המשך בעמוד הבא —</div>
+
+<div class="doc-title" style="font-size:16px;">נספח א' - לוקיישן</div>
+<div style="font-weight:700; text-decoration:underline; margin-bottom:13px; text-align:center;">נוסח הזמנה</div>
+
+<div class="clause" style="line-height:2.2;">
+  בעל הנכס מאשר בזאת את השימוש בנכס בן ${fv(d.rooms,'X')} חדרים אשר נמצא בכתובת: ${fv(d.addr,'____________________')} לשימוש על ידו לצורך ביצוע יום צילומים בתאריך: ${fv(sdateDisp,'_________')} בין השעות <span dir="ltr">${fv(d.tstart,'____')} - ${fv(d.tend,'____')}</span>.
+</div>
+<div class="clause">השימוש אשר יערך בנכס: ${fv(d.usage,'____________________________________')}</div>
+<div class="clause">דרישות נוספות: <strong>שטיפה וניקיון${d.req ? '. ' + d.req : '.'}</strong></div>
+<div class="clause"><span style="color:red;">בעל הנכס מצהיר ומתחייב כי הנכס מבוטח בביטוח מבנה וביטוח תכולה וכן ביטוח צד שלישי בסכומים המקובלים בתעשיה.</span></div>
+<div class="clause" style="line-height:2.2;">התמורה: בגין ${fv(d.hours,'X')} שעות ישולם לבעל הנכס סכום של ₪${fv(d.price,'Y')}. בגין כל שעה נוספת ישולם לבעל הנכס סכום של ₪${fv(d.extra,'Z')}.</div>
+<div class="clause" style="margin-bottom:26px;">ידוע לבעל הנכס כי הסכם זה אינו הסכם שכירות במקרקעין וספק השירותים אינו מתווך במקרקעין.</div>
+
+<div style="margin-bottom:18px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
+<table class="sig-table">
+  <tr>
+    <td>
+      <div style="text-align:center;">
+        <div id="sig-placeholder-2" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
+        <div class="sig-line">בעל הנכס<br/>${fv(d.oname,'________________')}</div>
+      </div>
+    </td>
+    <td><div class="sig-line">ספק השירותים<br/>איתי ראובני</div></td>
+  </tr>
+</table>
+`;
+}
+
+/* ══════════════════════════════════════════════════════
+   AGREEMENT 3 — הסכם מתן שירותים (לקוח ↔ איתי)
+   ══════════════════════════════════════════════════════ */
+function renderAgreement3(d) {
+  function fDateHeb(str) {
+    if (!str) return null;
+    const [y,m,dd] = str.split('-');
+    const mn = ['','ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+    return `${dd} ב${mn[parseInt(m,10)]} ${y}`;
+  }
+  function fDateDisp(str) {
+    if (!str) return null;
+    const [y,m,dd] = str.split('-');
+    return `${dd}/${m}/${y}`;
+  }
+  const dateFormatted = fDateHeb(d.date);
+  const sdate = fDateDisp(d.sdate);
+  const vatRate = parseFloat(d.vat) || 18;
+  const extraBase = parseFloat(d.extraBase) || 900;
+  const price = d.price;
+  const crewNum = d.crewNum;
+  const crewMax = d.crewMax || 0;
+  const crewMaxTotal = (crewNum && crewMax) ? (parseInt(crewNum) + parseInt(crewMax)) : 'Y+4';
+  const priceWithVat = price ? addCommas(parseFloat(price) * (1 + vatRate/100)) : '_______';
+  const extra150 = addCommas(extraBase * 1.5);
+  const showMarketing = d.showMarketing;
+
+  document.getElementById('doc-container').innerHTML = `
+<div class="doc-title">הסכם מתן שירותים</div>
+<div style="margin-bottom:18px; font-weight:700; text-align:center;">שנערך ונחתם ביום ${fv(dateFormatted,'_______________')}</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:18px;">ב י ן</div>
+<div style="text-align:center; margin-bottom:18px;">
+  מזמין <strong>${fv(d.cname,'____________________')}</strong><br>
+  ת.ז <strong>${fv(d.cid,'____________________')}</strong><br>
+  מרחוב: <strong>${fv(d.caddr,'____________________')}</strong><br>
+  (להלן: "הלקוח")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:4px;">מצד אחד</div>
+</div>
+<div style="text-align:center; font-weight:bold; margin-bottom:18px;">ל ב י ן</div>
+<div style="text-align:center; margin-bottom:26px;">
+  <strong>איתי ראובני – <span style="letter-spacing:1px">LOCK AND ACTION</span></strong><br>
+  ע.מ. 208777367<br>מרחוב שניר 112, כפר ורדים<br>(להלן: "ספק השירותים")
+  <div style="text-align:left; font-weight:bold; text-decoration:underline; margin-top:4px;">מצד שני</div>
+</div>
+
+<div class="clause"><strong>הואיל:</strong> וספק השירותים מציע ללקוחותיו שירותי איתור לוקיישנים ואובייקטים שונים לימי צילום, הכולל ליווי שוטף וכן התקשרות בהסכם עם בעל הלוקיישן כשלוח וכנציג מטעם הלקוח ("השירותים");</div>
+<div class="clause"><strong>והואיל:</strong> והלקוח מעוניין לבצע שימוש בלוקיישן לצורך יום צילומים במסגרת ${fv(d.use,'___________')}, ולשם כך פנה לספק השירותים;</div>
+<div class="clause"><strong>והואיל:</strong> וברצון הצדדים להסדיר את היחסים המשפטיים ביניהם;</div>
+<div class="clause" style="margin-bottom:22px;"></div>
+<div style="margin-bottom:13px;"><strong>לפיכך הוצהר, הותנה והוסכם בין הצדדים כדלקמן:</strong></div>
+
+<div class="clause"><strong>1. הגדרות ופרשנות</strong></div>
+<div class="clause" style="margin-bottom:13px;">1.1. המבוא להסכם זה מהווה חלק בלתי נפרד הימנו.</div>
+
+<div class="clause"><strong>2. השירותים</strong></div>
+<div class="clause">2.1. הלקוח מזמין בזאת מספק השירותים את השירותים בהתאם לתנאים המפורטים בהסכם זה.</div>
+<div class="clause">2.2. בחתימת הלקוח על הסכם זה, ממנה הלקוח את ספק השירותים כשלוח מטעמו וכנציגו החוקי להתקשר בהסכם עם בעל הנכס.</div>
+<div class="clause">2.3. <span style="color:red;">ביטוח. הלקוח מתחייב לרכוש פוליסת ביטוח יעודית כמקובל בתעשיה ליום צילומים, אשר יכלול ביטוח צד ג' וחבות מעבידים. הלקוח ימציא לספק השירותים אישור על קיום ביטוחים בטרם התקשרותו עם בעל הנכס.</span></div>
+<div class="clause">2.4. הלקוח מתחייב כי לא יפנה ולא יקיים כל קשר עם בעל נכס שהופנה אליו על ידי ספק השירותים, ללא אישורו.</div>
+<div class="clause" style="margin-bottom:13px;">2.5. כל שינוי בהזמנה לאחר ההתקשרות עם בעל הנכס חייב להיות מאושר מראש על ידי בעל הנכס. בשום מקרה לא ניתן לבצע שינוי שאינו לפחות 7 ימים בטרם המועד שנקבע.</div>
+
+<div class="clause"><strong>3. הצהרות הצדדים</strong></div>
+<div class="clause">3.1. כל צד מצהיר כי אין מניעה להתקשרותו בהסכם זה.</div>
+<div class="clause">3.2. הלקוח יבצע את פעילותו בנכס תוך שמירה על הוראות הדין, ויקפיד לשמור על הנכס וכל הרכוש הנמצא בו ולהחזירו בתום הפעילות במצב זהה לזה שקיבלו.</div>
+<div class="clause" style="margin-bottom:13px;">3.3. הלקוח מצהיר ומתחייב כי התמורה בגין השימוש בנכס תשולם לבעל הנכס בין אם הופיע הלקוח במועד הקבוע, ובין אם לאו.</div>
+
+<div class="clause"><strong>4. התמורה</strong></div>
+<div class="clause">4.1. בגין השימוש בנכס וביצוע השירותים, ישלם הלקוח לספק השירותים את התמורה כפי המפורט בנספח א'. התמורה תשולם עם שליחת טופס ההזמנה.</div>
+<div class="clause">4.2. עלות סיור לבדיקת הנכס הינה 400 ₪ ישולמו לספק השירותים במועד הסיור, ללא קשר להחלטת הלקוח.</div>
+<div class="clause">4.3. ביטול או שינוי מועד של הזמנת שימוש בנכס תתבצע לפחות 7 ימים מראש. ככל ולא ניתן יהיה לבטל, יחויב הלקוח במלוא העלות.</div>
+<div class="clause" style="margin-bottom:13px;">4.4. כל הזמנה נוספת עתידית של שימוש בנכס מבעל הנכס, תזכה את ספק השירותים בסכום של 10,000 ₪ לכל הזמנה כאמור.</div>
+
+<div class="clause"><strong>5. תקופת ההסכם</strong></div>
+<div class="clause" style="margin-bottom:13px;">5.1. תקופת ההתקשרות תחל ביום חתימת הסכם זה ותהא בתוקף עד לסיום השימוש בנכס.</div>
+
+<div class="clause"><strong>6. סודיות</strong></div>
+<div class="clause" style="margin-bottom:13px;">כל צד מצהיר ומתחייב לשמור בסודיות מוחלטת כל מידע הקשור לצד השני, לרבות תוכן הסכם זה, במשך תקופת ההתקשרות וכן לאחריה.</div>
+
+<div class="clause"><strong>7. היעדר אחריות</strong></div>
+<div class="clause" style="margin-bottom:13px;">7.1. ספק השירותים ו/או מי מטעמו לא יהיה אחראי לנזקים שיגרמו ללקוח בקשר עם השירותים. בכל מקרה אחריות ספק השירותים מוגבלת למחצית מסכום התמורה ששולמה בפועל.</div>
+
+<div class="clause"><strong>8. שונות</strong></div>
+<div class="clause" style="margin-bottom:22px;">8.1. הסכם זה מבטא את כל ההסכמות בין הצדדים ומחליף כל הסכמה קודמת. כל שינוי ייעשה בכתב ובחתימת הצדדים.</div>
+
+<div style="margin-bottom:18px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
+<table class="sig-table">
+  <tr>
+    <td>
+      <div style="text-align:center;">
+        <div id="sig-placeholder-1" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
+        <div class="sig-line">הלקוח<br/>${fv(d.cname,'________________')}</div>
+      </div>
+    </td>
+    <td><div class="sig-line">ספק השירותים<br/>איתי ראובני</div></td>
+  </tr>
+</table>
+
+<div class="page-break">— נספח א' —</div>
+
+<div class="doc-title" style="font-size:16px; text-decoration:none; text-align:right;">נספח א' - לוקיישן</div>
+<div style="font-weight:700; text-decoration:underline; margin-bottom:13px;">נוסח הזמנה</div>
+
+<div class="clause" style="line-height:2.2;">
+  הלקוח מזמין בזאת את השימוש בנכס בן ${fv(d.rooms,'X')} חדרים אשר נמצא ב ${fv(d.paddr,'____________________')} לצורך ביצוע יום צילומים בתאריך ${fv(sdate,'_________')} בין השעות <span dir="ltr">${fv(d.tstart,'____')} - ${fv(d.tend,'____')}</span>.
+</div>
+<div class="clause">השימוש אשר יערך בנכס: ${fv(d.use,'____________________')}.</div>
+<div class="clause">מספר המשתתפים ביום הצילום יהיה עד ${fv(crewNum,'Y')} אנשי צוות.</div>
+<div class="clause">במידה ומספר אנשי הצוות יעלה על ${fv(crewNum,'Y')} ועד ${fv(crewMaxTotal,'Y+4')} לכל היותר, יחויב הלקוח בתוספת של ${fv(d.crewExtra,'Z')} ש"ח לשעה לכל משתתף נוסף.</div>
+<div class="clause">דרישות נוספות: ${d.reqs ? d.reqs + ', ' : ''}<strong>ניקיון</strong>.</div>
+
+<div class="clause" style="line-height:2.2; margin-top:10px;">
+  התמורה: בגין ${fv(d.hours,'W')} שעות יחויב הלקוח בסכום של <span dir="ltr">${price ? addCommas(price) : 'A'}</span> ₪ + מע"מ (סה"כ ${fv(priceWithVat,'_______')} ₪).
+  בגין שעה נוספת יחויב הלקוח בסכום של ${fv(addCommas(extraBase),'900')} ₪${showMarketing ? ` ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% = <span dir="ltr">${fv(extra150,'1,350')}</span> ₪ + מע"מ` : ''}.
+</div>
+
+<div class="clause" style="margin-top:8px; font-size:0.92em;">
+  * התשלום יבוצע במעמד החתימה על טופס ההזמנה, ולכל המאוחר בתוך 3 ימים, ובכל מקרה לא יאוחר מ-3 ימים לפני מועד הצילום.<br>
+  * כתובת מדויקת תשלח לאחר חתימה על הסכם זה.
+</div>
+
+<div class="clause" style="margin-top:8px;"><strong>שימוש בתכנים:</strong> LOCK AND ACTION רשאים לצלם תכנים מאחורי הקלעים ולהשתמש בהם לשיווק ופרסום בכל פלטפורמה.</div>
+
+<div style="margin-top:18px;"><strong>ולראיה באו הצדדים על החתום:</strong></div>
+<table class="sig-table">
+  <tr>
+    <td>
+      <div style="text-align:center;">
+        <div id="sig-placeholder-2" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
+        <div class="sig-line">הלקוח<br/>${fv(d.cname,'________________')}</div>
+      </div>
+    </td>
+    <td><div class="sig-line">ספק השירותים<br/>איתי ראובני</div></td>
+  </tr>
+</table>
+`;
+}
+
+/* ══════════════════════════════════════════════════════
+   DOCUMENT SCALING FOR MOBILE
+   ══════════════════════════════════════════════════════ */
+function scaleDoc() {
+  const outer = document.getElementById('docScaleOuter');
+  const doc   = document.getElementById('doc-container');
+  const docW  = 794;
+  const avail = outer.clientWidth;
+  if (avail > 0 && avail < docW) {
+    const scale = avail / docW;
+    doc.style.transform = `scale(${scale})`;
+    doc.style.transformOrigin = 'top right';
+    outer.style.height = (doc.scrollHeight * scale) + 'px';
+  } else {
+    doc.style.transform = '';
+    outer.style.height = '';
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   SIGNATURE PAD
+   ══════════════════════════════════════════════════════ */
+const sigCanvas = document.getElementById('sigCanvas');
+const signaturePad = new SignaturePad(sigCanvas, {
+  backgroundColor: 'rgb(255,255,255)',
+  penColor: 'rgb(0,0,0)',
+  minWidth: 1.5,
+  maxWidth: 3
+});
+
+function resizeSigCanvas() {
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  const data = signaturePad.toData();
+  sigCanvas.width  = sigCanvas.offsetWidth  * ratio;
+  sigCanvas.height = sigCanvas.offsetHeight * ratio;
+  sigCanvas.getContext('2d').scale(ratio, ratio);
+  signaturePad.clear();
+  if (data && data.length) signaturePad.fromData(data);
+}
+
+['mousedown','touchstart'].forEach(ev =>
+  sigCanvas.addEventListener(ev, () => {
+    document.getElementById('sigHint').style.opacity = '0';
+  }, { passive: true })
+);
+
+function clearSig() {
+  signaturePad.clear();
+  document.getElementById('sigHint').style.opacity = '1';
+}
+
+/* ══════════════════════════════════════════════════════
+   SEND AGREEMENT VIA EmailJS
+   ══════════════════════════════════════════════════════ */
+async function sendAgreement() {
+  if (signaturePad.isEmpty()) {
+    alert('נא לחתום לפני השליחה');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ שולח...';
+
+  try {
+    const sigDataUrl = signaturePad.toDataURL('image/png');
+    const sigImg = `<img src="${sigDataUrl}" style="height:68px; max-width:185px; display:block; margin:0 auto;">`;
+
+    // Agreement 1: fill only the role-appropriate placeholder
+    if (agreementType === 1) {
+      const target = (agreementRole === 'owner') ? 'sig-owner' : 'sig-client';
+      const el = document.getElementById(target);
+      if (el) el.innerHTML = sigImg;
+    } else {
+      // Agreements 2 & 3: fill both signature locations
+      document.querySelectorAll('[id^="sig-placeholder"]').forEach(el => {
+        el.innerHTML = sigImg;
+      });
+    }
+
+    // Grab full document HTML (with embedded signature)
+    const contentHtml = document.getElementById('doc-container').innerHTML;
+
+    const agreementNames = {
+      1: agreementRole === 'owner' ? 'הסכם שימוש בלוקיישן – חתימת בעל נכס' : 'הסכם שימוש בלוקיישן – חתימת מזמין',
+      2: 'הסכם מתן שירותים (בעל נכס)',
+      3: 'הסכם מתן שירותים (לקוח)'
+    };
+    const signerName = (agreementType === 1 && agreementRole === 'client')
+      ? (agreementData.cname || 'לא צוין')
+      : (agreementData.oname || agreementData.cname || 'לא צוין');
+    const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      signer_name:     signerName,
+      agreement_type:  agreementNames[agreementType] || 'הסכם',
+      sign_date:       signDate,
+      content_html:    contentHtml
+    });
+
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('successState').style.display = 'flex';
+
+  } catch(err) {
+    console.error('EmailJS error:', err);
+    btn.disabled = false;
+    btn.innerHTML = '✅ חתום ושלח';
+    alert('שגיאה בשליחה:\n' + (err.text || err.message || JSON.stringify(err)));
+  }
+}
+
+/* ── Start ── */
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

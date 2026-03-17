@@ -342,6 +342,7 @@ try {
       </div>
 
       <button class="btn-gen" onclick="downloadPDF()">💾 שמור כ-PDF</button>
+      <button class="btn-gen" onclick="generateSignLink()" style="background:linear-gradient(135deg,#27ae60,#1e8449); margin-top:10px;">📤 שלח לחתימה</button>
       <button class="btn-preview-toggle" id="togglePreviewBtn" onclick="togglePreview()">👁 הצג תצוגה מקדימה</button>
     </div>
 
@@ -357,6 +358,21 @@ try {
     </div>
   </div>
 </section>
+
+<!-- Share Modal -->
+<div id="shareModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:16px; padding:32px; max-width:500px; width:92%; text-align:center; direction:rtl; box-shadow:0 20px 60px rgba(0,0,0,.4);">
+    <div style="font-size:2rem; margin-bottom:10px;">🔗</div>
+    <h3 style="color:#1a3a6b; margin-bottom:8px;">לינק לחתימה מוכן!</h3>
+    <p style="color:#6b7a8d; font-size:.88rem; margin-bottom:14px;">שלח את הלינק הבא לבעל הנכס לחתימה על ההסכם:</p>
+    <input id="shareLinkInput" type="text" readonly style="width:100%; padding:10px; border:1px solid #dde; border-radius:8px; font-size:.82rem; direction:ltr; background:#f7f8fc; margin-bottom:14px;" onclick="this.select()" />
+    <div style="display:flex; gap:10px; margin-bottom:12px;">
+      <button onclick="copyShareLink()" style="flex:1; padding:12px; background:#1a3a6b; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700; font-family:inherit;">📋 העתק לינק</button>
+      <button onclick="shareWhatsApp2()" style="flex:1; padding:12px; background:#25D366; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700; font-family:inherit;">💬 WhatsApp</button>
+    </div>
+    <button onclick="document.getElementById('shareModal').style.display='none'" style="background:none; border:none; color:#6b7a8d; cursor:pointer; font-family:inherit; font-size:.9rem;">סגור</button>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/he.js"></script>
@@ -520,6 +536,40 @@ function renderDoc() {
 </table>
 `;
   g('doc2').innerHTML = html;
+}
+
+function generateSignLink() {
+  function rawVal(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  const data = {
+    type: 2,
+    data: {
+      date:   rawVal('a2date'),
+      oname:  rawVal('a2oname'),
+      oid:    rawVal('a2oid'),
+      addr:   rawVal('a2addr'),
+      rooms:  rawVal('a2rooms'),
+      sdate:  rawVal('a2sdate'),
+      tstart: rawVal('a2tstart'),
+      tend:   rawVal('a2tend'),
+      hours:  rawVal('a2hours'),
+      price:  rawVal('a2price'),
+      extra:  rawVal('a2extra'),
+      usage:  rawVal('a2usage'),
+      req:    rawVal('a2req')
+    }
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const url = location.origin + '/sign.html#' + encoded;
+  document.getElementById('shareLinkInput').value = url;
+  document.getElementById('shareModal').style.display = 'flex';
+}
+function copyShareLink() {
+  const input = document.getElementById('shareLinkInput');
+  navigator.clipboard.writeText(input.value).then(() => alert('הלינק הועתק!')).catch(() => { input.select(); document.execCommand('copy'); alert('הועתק!'); });
+}
+function shareWhatsApp2() {
+  const url = document.getElementById('shareLinkInput').value;
+  window.open('https://wa.me/?text=' + encodeURIComponent('שלום, אנא קרא וחתום על ההסכם: ' + url), '_blank');
 }
 
 function downloadPDF() {

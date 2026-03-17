@@ -144,18 +144,38 @@
   </div>
 
   <div class="sign-section">
-    <div class="sign-card">
+
+    <!-- תיבת חתימה 1 (כל ההסכמים) -->
+    <div class="sign-card" id="padCard1">
       <h3 id="sigTitle">✍️ חתימה</h3>
-      <p class="sign-instructions">חתום/י בתיבה למטה עם האצבע (בנייד) או עם העכבר. לאחר החתימה לחץ/י על "חתום ושלח".</p>
+      <p class="sign-instructions" id="padInstr1">חתום/י בתיבה למטה עם האצבע (בנייד) או עם העכבר.</p>
       <div class="sig-pad-wrapper">
         <canvas id="sigCanvas"></canvas>
-        <div class="sig-hint" id="sigHint">חתום/י כאן</div>
+        <div class="sig-hint" id="sigHint1">חתום/י כאן</div>
       </div>
       <div class="sig-actions">
-        <button class="btn-clear" onclick="clearSig()">🗑 נקה</button>
-        <button class="btn-submit" id="submitBtn" onclick="sendAgreement()">✅ חתום ושלח</button>
+        <button class="btn-clear" onclick="clearSig(1)">🗑 נקה</button>
       </div>
     </div>
+
+    <!-- תיבת חתימה 2 (הסכמים 2 ו-3 בלבד — נספח א') -->
+    <div class="sign-card" id="padCard2" style="display:none; margin-top:16px;">
+      <h3>✍️ חתימה 2 – נספח א' (לוקיישן)</h3>
+      <p class="sign-instructions">חתום/י שוב לאישור נספח א'</p>
+      <div class="sig-pad-wrapper">
+        <canvas id="sigCanvas2"></canvas>
+        <div class="sig-hint" id="sigHint2">חתום/י כאן</div>
+      </div>
+      <div class="sig-actions">
+        <button class="btn-clear" onclick="clearSig(2)">🗑 נקה</button>
+      </div>
+    </div>
+
+    <!-- כפתור שליחה -->
+    <div style="margin-top:16px;">
+      <button class="btn-submit" id="submitBtn" onclick="sendAgreement()">✅ חתום ושלח</button>
+    </div>
+
   </div>
 
 </div>
@@ -174,7 +194,7 @@
 
 /* ═══════════════════════════════════════════════════════
    ⚙️  הגדרות EmailJS — החלף את הערכים שלהל
-   ═══════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════ */כ
 const EMAILJS_PUBLIC_KEY  = 'gEFid_j2titioXBb8';    // ← הכנס Public Key מ-EmailJS
 const EMAILJS_SERVICE_ID  = 'service_33cxjy5';   // ← Service ID (קיים)
 const EMAILJS_TEMPLATE_ID = 'template_Ipbkp4p';  // ← הכנס Template ID מ-EmailJS
@@ -216,6 +236,12 @@ function init() {
 
     renderAgreement();
     setWelcomeMessage();
+
+    // For agreements 2/3: show second pad and init it
+    if (agreementType === 2 || agreementType === 3) {
+      document.getElementById('padCard2').style.display = 'block';
+      signaturePad2 = new SignaturePad(sigCanvas2, sigPadOpts);
+    }
 
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
@@ -610,35 +636,44 @@ function scaleDoc() {
 }
 
 /* ══════════════════════════════════════════════════════
-   SIGNATURE PAD
+   SIGNATURE PADS (1 for agreement 1, 2 for agreements 2/3)
    ══════════════════════════════════════════════════════ */
-const sigCanvas = document.getElementById('sigCanvas');
-const signaturePad = new SignaturePad(sigCanvas, {
-  backgroundColor: 'rgb(255,255,255)',
-  penColor: 'rgb(0,0,0)',
-  minWidth: 1.5,
-  maxWidth: 3
-});
+const sigCanvas  = document.getElementById('sigCanvas');
+const sigCanvas2 = document.getElementById('sigCanvas2');
 
-function resizeSigCanvas() {
+const sigPadOpts = { backgroundColor:'rgb(255,255,255)', penColor:'rgb(0,0,0)', minWidth:1.5, maxWidth:3 };
+const signaturePad  = new SignaturePad(sigCanvas,  sigPadOpts);
+let   signaturePad2 = null; // initialized in init() for types 2/3
+
+function resizePad(canvas, pad) {
+  if (!canvas.offsetWidth) return;
   const ratio = Math.max(window.devicePixelRatio || 1, 1);
-  const data = signaturePad.toData();
-  sigCanvas.width  = sigCanvas.offsetWidth  * ratio;
-  sigCanvas.height = sigCanvas.offsetHeight * ratio;
-  sigCanvas.getContext('2d').scale(ratio, ratio);
-  signaturePad.clear();
-  if (data && data.length) signaturePad.fromData(data);
+  const data = pad.toData();
+  canvas.width  = canvas.offsetWidth  * ratio;
+  canvas.height = canvas.offsetHeight * ratio;
+  canvas.getContext('2d').scale(ratio, ratio);
+  pad.clear();
+  if (data && data.length) pad.fromData(data);
 }
 
-['mousedown','touchstart'].forEach(ev =>
-  sigCanvas.addEventListener(ev, () => {
-    document.getElementById('sigHint').style.opacity = '0';
-  }, { passive: true })
-);
+function resizeSigCanvas() {
+  resizePad(sigCanvas, signaturePad);
+  if (signaturePad2) resizePad(sigCanvas2, signaturePad2);
+}
 
-function clearSig() {
-  signaturePad.clear();
-  document.getElementById('sigHint').style.opacity = '1';
+['mousedown','touchstart'].forEach(ev => {
+  sigCanvas.addEventListener(ev,  () => { document.getElementById('sigHint1').style.opacity='0'; }, { passive:true });
+  sigCanvas2.addEventListener(ev, () => { document.getElementById('sigHint2').style.opacity='0'; }, { passive:true });
+});
+
+function clearSig(n) {
+  if (n === 2 && signaturePad2) {
+    signaturePad2.clear();
+    document.getElementById('sigHint2').style.opacity = '1';
+  } else {
+    signaturePad.clear();
+    document.getElementById('sigHint1').style.opacity = '1';
+  }
 }
 
 /* ══════════════════════════════════════════════════════
@@ -649,25 +684,32 @@ async function sendAgreement() {
     alert('נא לחתום לפני השליחה');
     return;
   }
+  if ((agreementType === 2 || agreementType === 3) && (!signaturePad2 || signaturePad2.isEmpty())) {
+    alert('נא לחתום גם בתיבת החתימה השנייה (נספח א\')');
+    return;
+  }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '⏳ שולח...';
 
   try {
-    const sigDataUrl = signaturePad.toDataURL('image/png');
-    const sigImg = `<img src="${sigDataUrl}" style="height:68px; max-width:185px; display:block; margin:0 auto;">`;
+    const sigDataUrl  = signaturePad.toDataURL('image/png');
+    const sigImg  = `<img src="${sigDataUrl}"  style="height:68px; max-width:185px; display:block; margin:0 auto;">`;
 
-    // Agreement 1: fill only the role-appropriate placeholder
     if (agreementType === 1) {
+      // Agreement 1: fill only the role-appropriate placeholder
       const target = (agreementRole === 'owner') ? 'sig-owner' : 'sig-client';
       const el = document.getElementById(target);
       if (el) el.innerHTML = sigImg;
     } else {
-      // Agreements 2 & 3: fill both signature locations
-      document.querySelectorAll('[id^="sig-placeholder"]').forEach(el => {
-        el.innerHTML = sigImg;
-      });
+      // Agreements 2/3: pad1 → sig-placeholder-1, pad2 → sig-placeholder-2
+      const el1 = document.getElementById('sig-placeholder-1');
+      if (el1) el1.innerHTML = sigImg;
+      const sigDataUrl2 = signaturePad2.toDataURL('image/png');
+      const sigImg2 = `<img src="${sigDataUrl2}" style="height:68px; max-width:185px; display:block; margin:0 auto;">`;
+      const el2 = document.getElementById('sig-placeholder-2');
+      if (el2) el2.innerHTML = sigImg2;
     }
 
     // Grab full document HTML (with embedded signature)

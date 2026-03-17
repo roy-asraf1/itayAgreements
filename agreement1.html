@@ -398,8 +398,9 @@
         crew:    rawVal('a1crew'),
         purp:    getPurp1()
       };
-      const ownerUrl  = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'owner',  data: baseData })))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-      const clientUrl = location.origin + '/sign.html#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'client', data: baseData })))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+      const signBase  = new URL('sign.html', location.href).href.split('#')[0];
+      const ownerUrl  = signBase + '#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'owner',  data: baseData })))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+      const clientUrl = signBase + '#' + btoa(unescape(encodeURIComponent(JSON.stringify({ type: 1, role: 'client', data: baseData })))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
       document.getElementById('ownerLinkInput').value  = ownerUrl;
       document.getElementById('clientLinkInput').value = clientUrl;
       document.getElementById('shareModal').style.display = 'flex';

@@ -559,7 +559,7 @@ function generateSignLink() {
     }
   };
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-  const url = location.origin + '/sign.html#' + encoded;
+  const url = new URL('sign.html', location.href).href.split('#')[0] + '#' + encoded;
   document.getElementById('shareLinkInput').value = url;
   document.getElementById('shareModal').style.display = 'flex';
 }

@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const chromium   = require('@sparticuz/chromium-min');
+const chromium   = require('@sparticuz/chromium');
 const puppeteer  = require('puppeteer-core');
 
 async function generatePdf(contentHtml) {
@@ -33,15 +33,11 @@ async function generatePdf(contentHtml) {
 <body>${contentHtml}</body>
 </html>`;
 
-  const executablePath = await chromium.executablePath(
-    'https://github.com/Sparticuz/chromium/releases/download/v131.0.0/chromium-v131.0.0-pack.tar'
-  );
-
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: { width: 794, height: 1123 },
-    executablePath,
-    headless: 'new',
+    executablePath: await chromium.executablePath(),
+    headless: chromium.headless,
   });
 
   const page = await browser.newPage();

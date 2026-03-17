@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/roy-asraf1/itayAgreements#readme",
   "dependencies": {
-    "@sparticuz/chromium-min": "^131.0.1",
+    "@sparticuz/chromium": "^143.0.4",
     "nodemailer": "^6.9.13",
     "pdf-parse": "^1.1.4",
     "puppeteer-core": "^23.11.1"

@@ -186,6 +186,7 @@
     <div class="icon">✅</div>
     <h2>ההסכם נחתם ונשלח!</h2>
     <p style="margin-top:10px; line-height:1.7;">תודה! ההסכם החתום הועבר לאיתי ראובני בהצלחה.</p>
+    <button onclick="printSignedDoc()" style="margin-top:18px; width:100%; padding:13px; background:linear-gradient(135deg,#1a3a6b,#2a5298); color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; font-family:inherit;">🖨️ הדפס / שמור PDF</button>
   </div>
 </div>
 
@@ -800,6 +801,7 @@ async function sendAgreement() {
 
     // Grab full document HTML (with embedded signature)
     const contentHtml = document.getElementById('doc-container').innerHTML;
+    signedContentHtml = contentHtml; // save for print button
 
     const agreementNames = {
       1: agreementRole === 'owner' ? 'הסכם שימוש בלוקיישן – חתימת בעל נכס' : 'הסכם שימוש בלוקיישן – חתימת מזמין',
@@ -811,19 +813,26 @@ async function sendAgreement() {
       : (agreementData.oname || agreementData.cname || 'לא צוין');
     const signDate = new Date().toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-    // Generate PDF from agreement HTML
-    const pdfContainer = document.createElement('div');
-    pdfContainer.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;padding:40px;background:#fff;font-family:Arial,sans-serif;direction:rtl;color:#1e2b3c;';
-    pdfContainer.innerHTML = contentHtml;
-    document.body.appendChild(pdfContainer);
+    // Generate PDF directly from the rendered doc-container (already on screen)
+    const docEl  = document.getElementById('doc-container');
+    const outerEl = document.getElementById('docScaleOuter');
+    const savedTransform = docEl.style.transform;
+    const savedTransformOrigin = docEl.style.transformOrigin;
+    const savedOuterHeight = outerEl.style.height;
+    docEl.style.transform = 'none';
+    docEl.style.transformOrigin = 'top right';
+    outerEl.style.height = 'auto';
 
     const pdfBlob = await html2pdf().set({
       margin: [10, 10],
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(pdfContainer).outputPdf('blob');
-    document.body.removeChild(pdfContainer);
+    }).from(docEl).outputPdf('blob');
+
+    docEl.style.transform = savedTransform;
+    docEl.style.transformOrigin = savedTransformOrigin;
+    outerEl.style.height = savedOuterHeight;
 
     const pdfBase64 = await new Promise((resolve) => {
       const reader = new FileReader();
@@ -856,6 +865,35 @@ async function sendAgreement() {
     btn.innerHTML = '✅ חתום ושלח';
     alert('שגיאה בשליחה:\n' + (err.text || err.message || JSON.stringify(err)));
   }
+}
+
+/* ── Print signed doc ── */
+let signedContentHtml = '';
+
+function printSignedDoc() {
+  if (!signedContentHtml) return;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>הסכם חתום – Lock and Action</title>
+<style>
+  body { font-family: Arial, 'Arial Hebrew', sans-serif; direction: rtl; color: #1e2b3c; padding: 30px; max-width: 794px; margin: 0 auto; }
+  .doc-title { font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 20px; text-decoration: underline; }
+  .clause { margin-bottom: 10px; line-height: 1.7; }
+  .sig-line { border-top: 1.5px solid #333; padding-top: 6px; text-align: center; font-size: 0.9rem; }
+  .sig-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  .sig-table td { width: 50%; padding: 10px; text-align: center; }
+  .page-break { page-break-after: always; border-top: 1px dashed #ccc; margin: 30px 0; text-align: center; font-size: 0.8rem; color: #888; }
+  @media print { body { padding: 0; } }
+</style>
+</head>
+<body>${signedContentHtml}</body>
+</html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 600);
 }
 
 /* ── Start ── */

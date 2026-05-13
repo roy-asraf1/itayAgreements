@@ -146,6 +146,13 @@
             <input id="a1oid" type="text" placeholder="מספר..." oninput="render1()" />
           </div>
         </div>
+        <div class="frow">
+          <label>מין בעל הנכס</label>
+          <select id="a1ogender" onchange="render1()">
+            <option value="f">נקבה</option>
+            <option value="m">זכר</option>
+          </select>
+        </div>
 
         <div class="sec-title">המזמין</div>
         <div class="frow"><label>שם המזמין</label><input id="a1cname" type="text" placeholder="שם מלא..." oninput="render1()" /></div>
@@ -159,13 +166,6 @@
             </select>
             <input id="a1cid" type="text" placeholder="מספר..." oninput="render1()" />
           </div>
-        </div>
-        <div class="frow">
-          <label>מין המזמין</label>
-          <select id="a1cgender" onchange="render1()">
-            <option value="f">נקבה</option>
-            <option value="m">זכר</option>
-          </select>
         </div>
 
         <div class="sec-title">פרטי הנכס</div>
@@ -293,10 +293,10 @@
       const hdate = hebDate(v('a1date')), hdate2 = hebDate(v('a1date2')), ts = v('a1tstart'), te = v('a1tend');
       const oname = v('a1oname'), oidtype = v('a1oidtype') || 'ת.ז.', oid = v('a1oid');
       const cname = v('a1cname'), cidtype = v('a1cidtype') || 'ת.ז.', cid = v('a1cid'), ptype = v('a1ptype'), addr = v('a1addr');
-      const cgender = v('a1cgender') || 'f';
-      const declare = cgender === 'm' ? 'מצהיר' : 'מצהירה';
-      const pronoun = cgender === 'm' ? 'שהוא' : 'שהיא';
-      const sigPoss = cgender === 'm' ? 'חתימתו' : 'חתימתה';
+      const ogender = v('a1ogender') || 'f';
+      const declare = ogender === 'm' ? 'מצהיר' : 'מצהירה';
+      const pronoun = ogender === 'm' ? 'שהוא' : 'שהיא';
+      const sigPoss = ogender === 'm' ? 'חתימתו' : 'חתימתה';
       const purp = getPurp1(), crew = v('a1crew');
 
       g('doc-container').innerHTML = `
@@ -415,7 +415,7 @@
         cname:   rawVal('a1cname'),
         cidtype: rawVal('a1cidtype') || 'ת.ז.',
         cid:     rawVal('a1cid'),
-        cgender: rawVal('a1cgender') || 'f',
+        ogender: rawVal('a1ogender') || 'f',
         ptype:   rawVal('a1ptype'),
         addr:    rawVal('a1addr'),
         crew:    rawVal('a1crew'),

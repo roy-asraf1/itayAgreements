@@ -288,10 +288,10 @@ function renderAgreement() {
 function renderAgreement1(d) {
   const oidtype = d.oidtype || 'ת.ז.';
   const cidtype = d.cidtype || 'ת.ז.';
-  const cgender = d.cgender || 'f';
-  const declare = cgender === 'm' ? 'מצהיר' : 'מצהירה';
-  const pronoun = cgender === 'm' ? 'שהוא' : 'שהיא';
-  const sigPoss = cgender === 'm' ? 'חתימתו' : 'חתימתה';
+  const ogender = d.ogender || 'f';
+  const declare = ogender === 'm' ? 'מצהיר' : 'מצהירה';
+  const pronoun = ogender === 'm' ? 'שהוא' : 'שהיא';
+  const sigPoss = ogender === 'm' ? 'חתימתו' : 'חתימתה';
   const purp = d.purp || '';
   document.getElementById('doc-container').innerHTML = `
 <div style="margin-bottom:10px; line-height:1.5; text-align:right;">

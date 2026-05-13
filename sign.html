@@ -287,6 +287,11 @@ function renderAgreement() {
    ══════════════════════════════════════════════════════ */
 function renderAgreement1(d) {
   const oidtype = d.oidtype || 'ת.ז.';
+  const cidtype = d.cidtype || 'ת.ז.';
+  const cgender = d.cgender || 'f';
+  const declare = cgender === 'm' ? 'מצהיר' : 'מצהירה';
+  const pronoun = cgender === 'm' ? 'שהוא' : 'שהיא';
+  const sigPoss = cgender === 'm' ? 'חתימתו' : 'חתימתה';
   const purp = d.purp || '';
   document.getElementById('doc-container').innerHTML = `
 <div style="margin-bottom:10px; line-height:1.5; text-align:right;">
@@ -301,12 +306,12 @@ function renderAgreement1(d) {
 <div class="doc-title">"הסכם שימוש בלוקיישן ${fvBold(d.ptype,'בית')} בכתובת ${fvBold(d.addr,'_____')}"</div>
 
 <div style="margin-bottom:6px; line-height:1.5; font-size:10.5pt;">
-  <strong>בין</strong> ${fvBold(d.cname,'המזמין')} ${oidtype} – ${fvBold(d.cid,'ת.ז.')} להלן "חברת ההפקה" או "הלקוח"<br/>
+  <strong>בין</strong> ${fvBold(d.cname,'המזמין')} ${cidtype} – ${fvBold(d.cid,'מס\' מזהה')} להלן "חברת ההפקה" או "הלקוח"<br/>
   <strong>לבין</strong> ${fvBold(d.oname,'בעל הנכס')} ${oidtype} ${fvBold(d.oid,'מס\' מזהה')}, ${fvBold(d.ptype,'סוג הנכס')} <strong>ברחוב</strong> ${fvBold(d.addr,'כתובת')} - להלן "הלוקיישן".
 </div>
 
 <div style="margin-bottom:5px;">
-  הח"מ מצהירה שהיא מטעם ${fvBold(d.ptype,'_____')} בכתובת ${fvBold(d.addr,'_____')}, אשר מנוהל ע"י בעל הנכס, וכי חתימתה מחייבת את שותפיו וכן את הנכס.
+  הח"מ ${declare} ${pronoun} מטעם ${fvBold(d.ptype,'_____')} בכתובת ${fvBold(d.addr,'_____')}, אשר מנוהל ע"י בעל הנכס, וכי ${sigPoss} מחייבת את שותפיו וכן את הנכס.
 </div>
 
 <div style="margin-bottom:5px;">
@@ -355,7 +360,7 @@ function renderAgreement1(d) {
     <td>
       <div style="text-align:center;">
         <div id="sig-client" style="min-height:68px; width:65%; margin:0 auto; display:flex; align-items:flex-end; justify-content:center;"></div>
-        <div class="sig-line">המזמין ת.ז <strong>${d.cid || '_____'}</strong><br/>${d.cname || 'שם המזמין'}</div>
+        <div class="sig-line">המזמין ${cidtype} <strong>${d.cid || '_____'}</strong><br/>${d.cname || 'שם המזמין'}</div>
       </div>
     </td>
   </tr>

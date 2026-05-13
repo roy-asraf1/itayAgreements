@@ -149,7 +149,24 @@
 
         <div class="sec-title">המזמין</div>
         <div class="frow"><label>שם המזמין</label><input id="a1cname" type="text" placeholder="שם מלא..." oninput="render1()" /></div>
-        <div class="frow"><label>תעודת זהות</label><input id="a1cid" type="text" placeholder="מספר ת.ז. ..." oninput="render1()" /></div>
+        <div class="frow">
+          <label>מספר מזהה</label>
+          <div class="id-wrap">
+            <select id="a1cidtype" title="סוג מזהה" onchange="render1()">
+              <option value="ת.ז.">ת.ז.</option>
+              <option value="ח.פ.">ח.פ.</option>
+              <option value="ע.מ.">ע.מ.</option>
+            </select>
+            <input id="a1cid" type="text" placeholder="מספר..." oninput="render1()" />
+          </div>
+        </div>
+        <div class="frow">
+          <label>מין המזמין</label>
+          <select id="a1cgender" onchange="render1()">
+            <option value="f">נקבה</option>
+            <option value="m">זכר</option>
+          </select>
+        </div>
 
         <div class="sec-title">פרטי הנכס</div>
         <div class="frow">
@@ -275,7 +292,11 @@
     function render1() {
       const hdate = hebDate(v('a1date')), hdate2 = hebDate(v('a1date2')), ts = v('a1tstart'), te = v('a1tend');
       const oname = v('a1oname'), oidtype = v('a1oidtype') || 'ת.ז.', oid = v('a1oid');
-      const cname = v('a1cname'), cid = v('a1cid'), ptype = v('a1ptype'), addr = v('a1addr');
+      const cname = v('a1cname'), cidtype = v('a1cidtype') || 'ת.ז.', cid = v('a1cid'), ptype = v('a1ptype'), addr = v('a1addr');
+      const cgender = v('a1cgender') || 'f';
+      const declare = cgender === 'm' ? 'מצהיר' : 'מצהירה';
+      const pronoun = cgender === 'm' ? 'שהוא' : 'שהיא';
+      const sigPoss = cgender === 'm' ? 'חתימתו' : 'חתימתה';
       const purp = getPurp1(), crew = v('a1crew');
 
       g('doc-container').innerHTML = `
@@ -292,12 +313,12 @@
 <div class="doc-title" style="margin-bottom:15px; text-decoration: underline;">הסכם שימוש בלוקיישן "${fv(ptype,'בית')} בכתובת ${fv(addr,'_____')}"</div>
 <!-- Intro -->
 <div style="margin-bottom:15px; line-height: 1.8; text-align: right; font-size: 11pt;">
-  <strong>בין</strong> ${fv(cname,'(ממלאים פה את המזמין)')} ${oidtype} – ${fv(cid,'(ממלאים תז מזמין)')} להלן "חברת ההפקה" או "הלקוח" <br/>
-  <strong>לבין</strong> ${fv(oname,'(ממלאים פה את בעל הנכס)')} ת.ז ${fv(oid,'(ממלאים תז בעל נכס)')} , ${fv(ptype,'(ממלאים פה סוג)')} <strong>ברחוב</strong> ${fv(addr,'(ממלאים פה כתובת)')} - להלן "הלוקיישן".
+  <strong>בין</strong> ${fv(cname,'(ממלאים פה את המזמין)')} ${cidtype} – ${fv(cid,'(ממלאים מזהה מזמין)')} להלן "חברת ההפקה" או "הלקוח" <br/>
+  <strong>לבין</strong> ${fv(oname,'(ממלאים פה את בעל הנכס)')} ${oidtype} ${fv(oid,'(ממלאים מזהה בעל נכס)')} , ${fv(ptype,'(ממלאים פה סוג)')} <strong>ברחוב</strong> ${fv(addr,'(ממלאים פה כתובת)')} - להלן "הלוקיישן".
 </div>
 
 <div style="margin-bottom: 15px;">
-  הח"מ מצהירה שהיא מטעם ${fv(ptype,'_____')} בכתובת ${fv(addr,'_____')}, אשר מנוהל ע"י בעל הנכס, וכי חתימתה מחייבת את שותפיו וכן את הנכס.
+  הח"מ ${declare} ${pronoun} מטעם ${fv(ptype,'_____')} בכתובת ${fv(addr,'_____')}, אשר מנוהל ע"י בעל הנכס, וכי ${sigPoss} מחייבת את שותפיו וכן את הנכס.
 </div>
 
 <div style="margin-bottom:10px;">
@@ -364,7 +385,7 @@
   </div>
   <div style="display:inline-block; width:45%; vertical-align:top; text-align:center; float:left;">
     <div style="border-top:1px solid #333; padding-top:8px; font-size:11pt; color:#555;">
-      המזמין ת.ז <strong>${fv(cid,'_____')}</strong><br/>${fv(cname,'שם המזמין')}
+      המזמין ${cidtype} <strong>${fv(cid,'_____')}</strong><br/>${fv(cname,'שם המזמין')}
     </div>
   </div>
   <div style="clear:both;"></div>
@@ -392,7 +413,9 @@
         oidtype: rawVal('a1oidtype') || 'ת.ז.',
         oid:     rawVal('a1oid'),
         cname:   rawVal('a1cname'),
+        cidtype: rawVal('a1cidtype') || 'ת.ז.',
         cid:     rawVal('a1cid'),
+        cgender: rawVal('a1cgender') || 'f',
         ptype:   rawVal('a1ptype'),
         addr:    rawVal('a1addr'),
         crew:    rawVal('a1crew'),

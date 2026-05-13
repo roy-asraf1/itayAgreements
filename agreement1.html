@@ -93,16 +93,21 @@
     .ag-list-item { margin-bottom: 4px; padding-right: 16px; text-indent: -16px; }
 
     /* ─── PRINT / PDF ─── */
-    @page { margin: 10mm; size: A4; }
+    @page { margin: 8mm; size: A4; }
     @media print {
+      html, body { width: 210mm !important; height: 297mm !important; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      body { background: white !important; margin: 0; padding: 0; }
+      body { background: white !important; margin: 0; padding: 0; -webkit-text-size-adjust: 100% !important; text-size-adjust: 100% !important; }
       .site-header, .form-panel, .preview-top, #backBtn { display: none !important; }
       .page { padding: 0 !important; min-height: unset !important; }
       .editor-wrap { display: block !important; }
       .preview-panel { display: block !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; background: white !important; }
       .doc-scroll { max-height: none !important; overflow: visible !important; border: none !important; border-radius: 0 !important; background: white !important; padding: 0 !important; display: block !important; }
-      #doc-container { box-shadow: none !important; width: 100% !important; min-height: unset !important; padding: 8mm 10mm !important; font-size: 9pt !important; line-height: 1.2 !important; }
+      #doc-container { box-shadow: none !important; width: 210mm !important; max-width: 210mm !important; min-height: unset !important; padding: 6mm 9mm !important; font-size: 8.5pt !important; line-height: 1.18 !important; }
+      #doc-container * { font-size: inherit; }
+      #doc-container .doc-title { font-size: 12pt !important; margin-bottom: 6px !important; }
+      #doc-container br { line-height: 1 !important; }
+      #doc-container table { page-break-inside: avoid !important; }
       .btn-gen, .btn-pdf, .btn-preview-toggle { display: none !important; }
     }
   </style>
@@ -372,19 +377,18 @@
 <div style="margin-bottom:6px;">חומר&nbsp;הגלם,&rlm; אופן השימוש בו ושיקולי העריכה הם של חברת&nbsp;ההפקה&nbsp;בלבד.&rlm;</div>
 <div style="margin-bottom:16px;">חברת&nbsp;ההפקה שומרת לעצמה&nbsp;את&nbsp;הזכות&nbsp;לביטול&nbsp;הצילומים.&rlm;</div>
 
-<br/>
 
 <!-- Signatures -->
-<div style="margin-bottom:10px; font-weight:700; margin-top:30px;">אנו&nbsp;הח"מ&nbsp;מאשרים&nbsp;את&nbsp;פרטי&nbsp;ההסכם</div>
+<div style="margin-bottom:6px; font-weight:700; margin-top:14px;">אנו&nbsp;הח"מ&nbsp;מאשרים&nbsp;את&nbsp;פרטי&nbsp;ההסכם</div>
 
-<div style="margin-top:30px; display:block; position:relative; width:100%; height:80px; page-break-inside:avoid;">
+<div style="margin-top:18px; display:block; position:relative; width:100%; height:60px; page-break-inside:avoid;">
   <div style="display:inline-block; width:45%; vertical-align:top; text-align:center; float:right;">
-    <div style="border-top:1px solid #333; padding-top:8px; font-size:11pt; color:#555;">
+    <div style="border-top:1px solid #333; padding-top:6px; font-size:10pt; color:#555;">
       בעל הנכס ${oidtype} <strong>${fv(oid,'_____')}</strong><br/>${fv(oname,'שם בעל הנכס')}
     </div>
   </div>
   <div style="display:inline-block; width:45%; vertical-align:top; text-align:center; float:left;">
-    <div style="border-top:1px solid #333; padding-top:8px; font-size:11pt; color:#555;">
+    <div style="border-top:1px solid #333; padding-top:6px; font-size:10pt; color:#555;">
       המזמין ${cidtype} <strong>${fv(cid,'_____')}</strong><br/>${fv(cname,'שם המזמין')}
     </div>
   </div>

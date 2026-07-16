@@ -184,7 +184,7 @@
       .preview-panel { box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; background: white !important; }
       .doc-scroll { max-height: none !important; overflow: visible !important; border: none !important; border-radius: 0 !important; }
       #doc3 { padding: 15mm 18mm !important; font-size: 13px !important; line-height: 1.5 !important; }
-      .page-break { page-break-before: always !important; border: none !important; color: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; }
+      .page-break { page-break-before: always !important; border: none !important; color: transparent !important; margin: 0 !important; padding: 15mm 0 0 0 !important; height: 0 !important; }
       .btn-gen, .btn-pdf { display: none !important; }
     }
 
@@ -558,7 +558,7 @@ function renderDoc() {
 <div class="doc-title" style="text-decoration:none; text-align:right;"><strong>נספח א' - לוקיישן</strong></div>
 <div style="font-weight:700; text-decoration:underline; margin-bottom:15px;">נוסח הזמנה</div>
 
-<div class="clause" style="line-height:1.6;">
+<div class="clause" style="line-height:2;">
 הלקוח מזמין בזאת את השימוש בנכס בן ${fv(rooms, 'X')} חדרים אשר נמצא ב ${fv(paddr, '____________________')} לרבות כל תכולתו, לשימוש על ידו לצורך ביצוע יום צילומים בתאריך ${fv(sdate, '_________')} בין השעות <span dir="ltr">${fv(tstart, '____')} - ${fv(tend, '____')}</span>.
 </div>
 
@@ -571,7 +571,7 @@ function renderDoc() {
 הלקוח יבצע את פעילותו בנכס תוך שמירה על הוראות הדין ויקפיד לשמור על הנכס וכל הרכוש הנמצא בו שמירה קפדנית ולהחזירו בתום הפעילות במצב זהה לזה שקיבלו. ככל ונגרם נזק כלשהו לנכס, ידווח הלקוח לספק השירותים על הנזק האמור. כל נזק לנכס או לרכוש שיהיה בו יהיה באחריותו ועל חשבונו של הלקוח.
 </div>
 
-<div class="clause" style="line-height:1.6; margin-top: 10px;">
+<div class="clause" style="line-height:2; margin-top: 10px;">
 התמורה בגין השימוש בנכס תהיה כדלהלן: בגין ${fv(hours, 'W')} שעות יחויב הלקוח בסכום של <span dir="ltr">${formattedPrice}</span> ₪ + מע"מ (בסה"כ ${fv(priceWithVat, '_______')} ₪). 
 בגין שעה נוספת יחויב הלקוח בסכום של ${fv(formattedExtraBase, '900')} ₪${showMarketing ? ` ולאחר חריגה בשעה הראשונה יחויב בקנס של 150% כלומר ${fv(formattedExtraBase, '900')}  1.5 X = <span dir="ltr">${fv(extra150, '1,350')}</span> ₪ + מע"מ` : ''}.
 </div>
